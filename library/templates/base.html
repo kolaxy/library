@@ -2,17 +2,44 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>library</title>
+         {% if title %}
+        <title>E-LIB - {{ title }}</title>
+        {% else %}
+        <title>E-LIB</title>
+        {% endif %}
          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     </head>
-
     <body>
         {% include 'base/navbar.html' %}
-        <div class="container">
-            {% block content %}
-            <h3>This will be replaced</h3>
-            {% endblock content %}
-        </div>
-         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+         <main role="main" class="container" style="background-color: #eee;">
+             <div class="p-3">
+                <div class="row">
+                    <div class="col-md-8">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% block content %}{% endblock %}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="content-section">
+                            <legend class="border-bottom mb-4">Быстрый доступ</legend>
+                            <p class='text-muted'>You can put any information here you'd like.
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-light">Latest Posts</li>
+                                    <li class="list-group-item list-group-item-light">Announcements</li>
+                                    <li class="list-group-item list-group-item-light">Calendars</li>
+                                    <li class="list-group-item list-group-item-light">etc</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     </body>
 </html>
