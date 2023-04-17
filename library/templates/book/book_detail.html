@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <article class="media content-section">
+        <div class="media-body">
+            <legend class="border-bottom mb-4">{{ object.name }}</legend>
+            <p>{{ object.author }}</p>
+            <p>{{ object.genre }}</p>
+            <p>{{ object.isbn }}</p>
+            <p>{{ object.annotation }}</p>
+        </div>
+    </article>
+{% endblock content %}
