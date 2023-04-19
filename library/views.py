@@ -33,6 +33,12 @@ class BookDetailView(DetailView):
     template_name = 'book/book_detail.html'
 
 
+class BookListView(ListView):
+    model = Book
+    context_object_name = 'books'
+    template_name = 'book/book_list.html'
+
+
 def author_create(request):
     if request.method == 'POST':
         form = AuthorCreate(request.POST)
