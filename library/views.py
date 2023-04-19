@@ -18,7 +18,7 @@ def book_create(request):
         if form.is_valid():
             form.instance.creator = request.user
             form.save()
-            return redirect('library-home')
+            return redirect('book-detail', pk=form.instance.pk)
 
     else:
         form = BookCreate()
