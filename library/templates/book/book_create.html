@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Новая книга{% endblock %}
+{% block content %}
+<style>label {
+  display: block;
+}
+
+.genre {
+  float: right;
+}
+</style>
+<legend class="border-bottom mb-4">Добавить книгу</legend>
+<form class="row g-3" method="POST">
+    {% csrf_token %}
+    <div class="col-md-6">
+        <label for="name" class="form-label">Название книги</label>
+        {{ form.name }}
+        {{ form.name.errors }}
+    </div>
+    <div class="col-md-6">
+        <label for="genre" class="form-label">Жанр</label>
+        {{ form.genre }}
+        {{ form.genre.errors }}
+    </div>
+    <div class="col-md-6">
+        <label for="author" class="form-label">Автор<span class="genre"><a href="#" class="nav-item nav-link">Добавить автора</a></span></label>
+        {{ form.author }}
+        {{ form.author.errors }}
+    </div>
+    <div class="col-md-6">
+        <label for="isbn" class="form-label">ISBN (до 13 цифр)</label>
+        {{ form.isbn }}
+        {{ form.isbn.errors }}
+    </div>
+    <div class="col-md-12">
+        <label for="annotation" class="form-label">Аннотация</label>
+        {{ form.annotation }}
+        {{ form.annotation.errors }}
+    </div>
+    <div class="col-12">
+        <button type="submit" class="save btn btn-secondary">Сохранить</button>
+    </div>
+</form>
+{% endblock %}

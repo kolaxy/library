@@ -5,16 +5,16 @@ from django.core.validators import RegexValidator
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField('Жанр', max_length=30)
 
     def __str__(self):
         return self.name
 
 
 class Author(models.Model):
-    surname = models.CharField(max_length=30)
-    name = models.CharField(max_length=30)
-    family_name = models.CharField(max_length=30)
+    surname = models.CharField('Фамилия', max_length=30)
+    name = models.CharField('Имя', max_length=30)
+    family_name = models.CharField('Отчество', max_length=30)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     is_archive = models.BooleanField(default=False)
 
@@ -23,11 +23,11 @@ class Author(models.Model):
 
 
 class Book(models.Model):
-    name = models.CharField(max_length=30)
-    annotation = models.TextField()
-    isbn = models.CharField(max_length=13, validators=[RegexValidator(r'^\d{1,10}$')], unique=True, null=True)
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    name = models.CharField('Название книги', max_length=30)
+    annotation = models.TextField('Аннотация', max_length=1100)
+    isbn = models.CharField('ISBN', max_length=13, validators=[RegexValidator(r'^\d{1,10}$')], unique=True)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Жанр')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор')
     creation_time = models.DateTimeField(auto_now_add=True)
     is_archive = models.BooleanField(default=False)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
