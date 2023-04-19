@@ -3,6 +3,7 @@ from . import views
 from .forms import BookCreate
 from library.views import (
     BookDetailView,
+    AuthorDetailView,
 )
 
 urlpatterns = [
@@ -10,5 +11,6 @@ urlpatterns = [
     path('about/', views.about, name='library-about'),
     path('books/<int:pk>/', BookDetailView.as_view(), name='book-detail'),
     path('books/new/', views.book_create, name='book-create'),
-    # path('authors/new/', AuthorCreateView.as_view(), name='author-create'),
+    path('authors/new/', views.author_create, name='author-create'),
+    path('authors/<int:pk>/', AuthorDetailView.as_view(), name='author-detail'),
 ]

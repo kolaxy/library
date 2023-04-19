@@ -24,7 +24,13 @@
         {{ form.genre.errors }}
     </div>
     <div class="col-md-6">
-        <label for="author" class="form-label">Автор<span class="genre"><a href="#" class="nav-item nav-link">Добавить автора</a></span></label>
+        <label for="author" class="form-label">
+            Автор<span class="genre">
+                    <a href="{% url 'author-create' %}" class="nav-item nav-link">
+                        Добавить автора
+                    </a>
+                </span>
+        </label>
         {{ form.author }}
         {{ form.author.errors }}
     </div>

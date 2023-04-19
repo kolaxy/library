@@ -1,37 +1,24 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block title %}Добавление книги{% endblock %}
+{% block title %}Новый автор{% endblock %}
 {% block content %}
-<style>label {
-  display: block;
-}
-
-.genre {
-  float: right;
-}
-</style>
-<legend class="border-bottom mb-4">Добавить книгу</legend>
-<form class="row g-3" method="post">
+<legend class="border-bottom mb-4">Добавить автора</legend>
+<form class="row g-3" method="POST">
     {% csrf_token %}
     <div class="col-md-6">
-        <label for="name" class="form-label">Название книги</label>
+        <label for="surname" class="form-label">Фамилия</label>
+        {{ form.surname }}
+        {{ form.surname.errors }}
+    </div>
+    <div class="col-md-6">
+        <label for="name" class="form-label">Имя</label>
         {{ form.name }}
+        {{ form.name.errors }}
     </div>
     <div class="col-md-6">
-        <label for="genre" class="form-label">Жанр</label>
-        {{ form.genre }}
-    </div>
-    <div class="col-md-6">
-        <label for="author" class="form-label">Автор<span class="genre">Добавить автора</span></label>
-        {{ form.author }}
-    </div>
-    <div class="col-md-6">
-        <label for="isbn" class="form-label">ISBN (до 13 цифр)</label>
-        {{ form.isbn }}
-    </div>
-    <div class="col-md-6">
-        <label for="annotation" class="form-label">Аннотация</label>
-        {{ form.annotation }}
+        <label for="family_name" class="form-label">Отчество</label>
+        {{ form.family_name }}
+        {{ form.family_name.errors }}
     </div>
     <div class="col-12">
         <button type="submit" class="save btn btn-secondary">Сохранить</button>

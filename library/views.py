@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
 from .models import Author, Book, Genre
-from .forms import BookCreate
+from .forms import BookCreate, AuthorCreate
 from django.contrib import messages
+
 
 def home(request):
     return render(request, 'home.html')
@@ -26,21 +27,25 @@ def book_create(request):
     return render(request, 'book/book_create.html', {'form': form})
 
 
-# class BookCreateView(CreateView):
-#     model = Book
-#     fields = ['name', 'annotation', 'isbn', 'genre', 'author']
-#     template_name = 'book/book_create.html'
-#
-#     def form_valid(self, form):
-#         form.instance.creator = self.request.user
-#         return super().form_valid(form)
-
-
 class BookDetailView(DetailView):
     model = Book
     template_name = 'book/book_detail.html'
 
 
-# class AuthorCreateView(CreateView):
-#     model = Author
-#     template_name = 'author/author_create.html'
+def author_create(request):
+    if request.method == 'POST':
+        form = AuthorCreate(request.POST)
+        if form.is_valid():
+            form.instance.creator = request.user
+            form.save()
+            messages.success(request, f'Автор с именем "{form.instance.name}" был создан.')
+            return redirect('author-detail', pk=form.instance.pk)
+
+    else:
+        form = AuthorCreate()
+    return render(request, 'author/author_create.html', {'form': form})
+
+
+class AuthorDetailView(DetailView):
+    model = Author
+    template_name = 'author/author_detail.html'
