@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
 from .models import Author, Book, Genre
 from .forms import BookCreate
-
+from django.contrib import messages
 
 def home(request):
     return render(request, 'home.html')
@@ -18,6 +18,7 @@ def book_create(request):
         if form.is_valid():
             form.instance.creator = request.user
             form.save()
+            messages.success(request, f'Страница для "{form.instance.name}" была создана.')
             return redirect('book-detail', pk=form.instance.pk)
 
     else:
