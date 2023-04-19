@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>E-LIB - {% block title %}{% endblock title %}</title>
@@ -7,7 +8,7 @@
     </head>
     <body>
         {% include 'base/navbar.html' %}
-         <main role="main" class="container" style="background-color: #eee;">
+         <main role="main" class="container" style="bottom: 0; height: 90vh;background-color: #eee;">
              <div class="p-3">
                 <div class="row">
                     <div class="col-md-8">
