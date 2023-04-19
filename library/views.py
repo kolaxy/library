@@ -37,6 +37,7 @@ class BookListView(ListView):
     model = Book
     context_object_name = 'books'
     template_name = 'book/book_list.html'
+    paginate_by = 10
 
 
 def author_create(request):
@@ -67,3 +68,4 @@ class AuthorListView(ListView):
     model = Author
     context_object_name = 'authors'
     template_name = 'author/author_list.html'
+    paginate_by = 10
