@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from .models import Author, Book, Genre
 from .forms import BookCreate, AuthorCreate
 from django.contrib import messages
@@ -49,3 +50,14 @@ def author_create(request):
 class AuthorDetailView(DetailView):
     model = Author
     template_name = 'author/author_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['book_list'] = Book.objects.filter(id=self.kwargs['pk'])
+        return context
+
+
+class AuthorListView(ListView):
+    model = Author
+    context_object_name = 'authors'
+    template_name = 'author/author_list.html'

@@ -13,7 +13,7 @@ class BookCreate(forms.ModelForm):
             "genre": forms.Select(attrs={'class': 'form-control', 'placeholder': 'Введите жанр'}),
             "author": forms.Select(attrs={'class': 'form-control', 'placeholder': 'Автор'}),
             "isbn": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ISBN'}),
-            "annotation": forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите аннотация'})
+            "annotation": forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите аннотацию'})
         }
 
 

@@ -5,17 +5,17 @@
 <legend class="border-bottom mb-4">Добавить автора</legend>
 <form class="row g-3" method="POST">
     {% csrf_token %}
-    <div class="col-md-6">
+    <div class=".col-sm-5 .col-md-6">
         <label for="surname" class="form-label">Фамилия</label>
         {{ form.surname }}
         {{ form.surname.errors }}
     </div>
-    <div class="col-md-6">
+    <div class=".col-sm-5 .col-md-6">
         <label for="name" class="form-label">Имя</label>
         {{ form.name }}
         {{ form.name.errors }}
     </div>
-    <div class="col-md-6">
+    <div class=".col-sm-5 .col-md-6">
         <label for="family_name" class="form-label">Отчество</label>
         {{ form.family_name }}
         {{ form.family_name.errors }}
