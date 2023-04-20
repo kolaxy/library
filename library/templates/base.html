@@ -26,9 +26,10 @@
                             <legend class="border-bottom mb-4">Быстрый доступ</legend>
                                 <ul class="list-group">
                                     <li class="list-group-item list-group-item-light">
-                                        <form class="d-flex" role="search">
-                                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                            <button class="btn btn-outline-success" type="submit">Search</button>
+                                        <form class="d-flex" role="search" method="POST" action="{% url 'search' %}">
+                                            {% csrf_token %}
+                                            <input class="form-control me-2" type="search" placeholder="Введите запрос" aria-label="Search" name="searched">
+                                            <button class="btn btn-outline-secondary" type="submit">Найти</button>
                                         </form>
                                     </li>
                                     <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'book-create' %}">Добавить книгу</a></li>

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Поиск книг{% endblock %}
+{% block content %}
+    {% if searched %}
+        <legend class="border-bottom mb-4">Результаты поиска по запросу "{{ searched }}"</legend>
+        <div class="row">
+            <div class="col">
+                <p><strong>Найденные книги:</strong></p>
+                <ul class="list-group">
+                    {% for book in books %}
+                        <li class="list-group-item list-group-item-action list-group-item-secondary">
+                            <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">{{ book }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col">
+                <p><strong>Найденные авторы:</strong></p>
+                <ul class="list-group">
+                    {% for author in authors %}
+                        <li class="list-group-item list-group-item-action list-group-item-secondary">
+                            <a href="{% url 'author-detail' author.id %}" class="nav-item nav-link">{{ author }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <legend class="border-bottom mb-4">Введен пустой поисковый запрос</legend>
+    {% endif %}
+{% endblock %}

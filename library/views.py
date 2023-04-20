@@ -4,6 +4,7 @@ from django.views.generic.list import ListView
 from .models import Author, Book, Genre
 from .forms import BookCreate, AuthorCreate
 from django.contrib import messages
+from django.db.models import Q
 
 
 def home(request):
@@ -12,6 +13,19 @@ def home(request):
 
 def about(request):
     return render(request, 'about.html')
+
+
+def search(request):
+    if request.method == 'POST':
+        searched = request.POST['searched']
+        search_result = []
+        books = Book.objects.filter(name__contains=searched)
+        authors = Author.objects.filter(Q(family_name__contains=searched) |
+                                        Q(name__contains=searched) |
+                                        Q(surname__contains=searched))
+        return render(request, 'search.html', {'searched': searched, 'books': books, 'authors': authors})
+    else:
+        return render(request, 'search.html', {})
 
 
 def book_create(request):
