@@ -28,7 +28,7 @@
                                     <li class="list-group-item list-group-item-light">
                                         <form class="d-flex" role="search" method="POST" action="{% url 'search' %}">
                                             {% csrf_token %}
-                                            <input class="form-control me-2" type="search" placeholder="Введите запрос" aria-label="Search" name="searched">
+                                            <input class="form-control me-2" type="search" placeholder="Имя автора или название книги" aria-label="Search" name="searched">
                                             <button class="btn btn-outline-secondary" type="submit">Найти</button>
                                         </form>
                                     </li>

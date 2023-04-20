@@ -4,7 +4,7 @@
     {% if searched %}
         {{ searched }}
     {% else %}
-        Поиск книг
+        Поиск
     {% endif %}
 {% endblock %}
 {% block content %}
@@ -14,13 +14,22 @@
             <div class="row">
                 <div class="col">
                     <p><strong>Найденные книги:</strong></p>
-                    <ul class="list-group">
-                        {% for book in books %}
-                            <li class="list-group-item list-group-item-action list-group-item-secondary">
-                                <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">{{ book }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% if books %}
+                        <ul class="list-group">
+                            {% for book in books %}
+                                <li class="list-group-item list-group-item-action list-group-item-secondary">
+                                    <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">{{ book }}</a>
+                                    <small>
+                                        <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">
+                                            {{ book.author.surname }} {{ book.author.name|slice:"1" }}.{{ book.author.family_name|slice:"1" }}.
+                                        </a>
+                                    </small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>По Вашему запросу ничего не найдено.</p>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <p><strong>Найденные авторы:</strong></p>

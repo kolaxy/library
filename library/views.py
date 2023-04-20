@@ -18,11 +18,10 @@ def about(request):
 def search(request):
     if request.method == 'POST':
         searched = request.POST['searched']
-        search_result = []
-        books = Book.objects.filter(name__contains=searched)
-        authors = Author.objects.filter(Q(family_name__contains=searched) |
-                                        Q(name__contains=searched) |
-                                        Q(surname__contains=searched))
+        books = Book.objects.filter(name__icontains=searched)
+        authors = Author.objects.filter(Q(family_name__icontains=searched) |
+                                        Q(name__icontains=searched) |
+                                        Q(surname__icontains=searched))
         return render(request, 'search.html', {'searched': searched, 'books': books, 'authors': authors})
     else:
         return render(request, 'search.html', {})
@@ -74,7 +73,7 @@ class AuthorDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['book_list'] = Book.objects.filter(id=self.kwargs['pk'])
+        context['book_list'] = Book.objects.filter(author=self.kwargs['pk'])
         return context
 
 
