@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block title %}
-    {% if searched %}
-        {{ searched }}
+    {% if q %}
+        {{ q }}
     {% else %}
         Поиск
     {% endif %}
 {% endblock %}
 {% block content %}
-    {% if searched %}
-        <legend class="border-bottom mb-4">Результаты поиска по запросу "{{ searched }}"</legend>
+    {% if q %}
+        <legend class="border-bottom mb-4">Результаты поиска по запросу "{{ q }}"</legend>
         {% if books or authors %}
             <div class="row">
                 <div class="col">

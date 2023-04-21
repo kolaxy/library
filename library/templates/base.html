@@ -26,9 +26,8 @@
                             <legend class="border-bottom mb-4">Быстрый доступ</legend>
                                 <ul class="list-group">
                                     <li class="list-group-item list-group-item-light">
-                                        <form class="d-flex" role="search" method="POST" action="{% url 'search' %}">
-                                            {% csrf_token %}
-                                            <input class="form-control me-2" type="search" placeholder="Имя автора или название книги" aria-label="Search" name="searched">
+                                        <form class="d-flex" role="search" method="GET" action="{% url 'search' %}">
+                                            <input class="form-control me-2" type="search" placeholder="Имя автора или название книги" aria-label="Search" name="q">
                                             <button class="btn btn-outline-secondary" type="submit">Найти</button>
                                         </form>
                                     </li>

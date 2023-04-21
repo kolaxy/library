@@ -16,13 +16,13 @@ def about(request):
 
 
 def search(request):
-    if request.method == 'POST':
-        searched = request.POST['searched']
-        books = Book.objects.filter(name__icontains=searched)
-        authors = Author.objects.filter(Q(family_name__icontains=searched) |
-                                        Q(name__icontains=searched) |
-                                        Q(surname__icontains=searched))
-        return render(request, 'search.html', {'searched': searched, 'books': books, 'authors': authors})
+    if request.method == "GET":
+        q = request.GET.get('q')
+        books = Book.objects.filter(name__icontains=q)
+        authors = Author.objects.filter(Q(family_name__icontains=q) |
+                                        Q(name__icontains=q) |
+                                        Q(surname__icontains=q))
+        return render(request, 'search.html', {'q': q, 'books': books, 'authors': authors})
     else:
         return render(request, 'search.html', {})
 
