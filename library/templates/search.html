@@ -17,7 +17,7 @@
                     {% if books %}
                         <ul class="list-group">
                             {% for book in books %}
-                                <li class="list-group-item list-group-item-action list-group-item-secondary">
+                                <li class="list-group-item list-group-item-action list-group-item-light">
                                     <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">{{ book }}</a>
                                     <small>
                                         <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">
@@ -35,7 +35,7 @@
                     <p><strong>Найденные авторы:</strong></p>
                     <ul class="list-group">
                         {% for author in authors %}
-                            <li class="list-group-item list-group-item-action list-group-item-secondary">
+                            <li class="list-group-item list-group-item-action list-group-item-light">
                                 <a href="{% url 'author-detail' author.id %}" class="nav-item nav-link">{{ author }}</a>
                             </li>
                         {% endfor %}

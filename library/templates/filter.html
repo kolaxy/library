@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Книги{% endblock %}
+{% block content %}
+    <legend class="border-bottom mb-4">Результаты фильтрации</legend>
+        <ul class="list-group">
+            {% for book in books %}
+                <li class="list-group-item list-group-item-action list-group-item-light">
+                    <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">{{ book }} </a>
+                    <small>
+                        <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link">
+                            {{ book.author.surname }} {{ book.author.name|slice:"1" }}.{{ book.author.family_name|slice:"1" }}.
+                        </a>
+                    </small>
+                </li>
+            {% endfor %}
+        </ul>
+{% endblock %}

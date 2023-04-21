@@ -5,6 +5,7 @@ from .models import Author, Book, Genre
 from .forms import BookCreate, AuthorCreate
 from django.contrib import messages
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -27,6 +28,34 @@ def search(request):
         return render(request, 'search.html', {})
 
 
+class GenreAuthor:
+    """Жанры и авторы книг"""
+
+    def get_genres(self):
+        return Genre.objects.all()
+
+    def get_authors(self):
+        return Author.objects.all()
+
+
+class FilterBooksView(GenreAuthor, ListView):
+    template_name = 'filter.html'
+    context_object_name = 'books'
+
+    def get_queryset(self):
+        if 'genre' in self.request.GET and 'author' in self.request.GET:
+            print('if genre and author')
+            queryset = Book.objects.filter(
+                Q(author__in=self.request.GET.getlist("author")), Q(genre__in=self.request.GET.getlist("genre"))
+            )
+        else:
+            print('else')
+            queryset = Book.objects.filter(
+                Q(author__in=self.request.GET.getlist("author")) | Q(genre__in=self.request.GET.getlist("genre"))
+            )
+        return queryset
+
+
 def book_create(request):
     if request.method == 'POST':
         form = BookCreate(request.POST)
@@ -46,7 +75,7 @@ class BookDetailView(DetailView):
     template_name = 'book/book_detail.html'
 
 
-class BookListView(ListView):
+class BookListView(GenreAuthor, ListView):
     model = Book
     context_object_name = 'books'
     template_name = 'book/book_list.html'

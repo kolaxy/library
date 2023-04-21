@@ -4,9 +4,51 @@
     <article class="media content-section">
         <div class="media-body">
             <legend class="border-bottom mb-4">Книги</legend>
-            {% for book in books %}
-                <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link"><p>{{ book }}</p></a>
+            <p>
+                <a class="btn btn-outline-secondary" data-bs-toggle="collapse" href="#collapseExample" role="button"
+                   aria-expanded="false" aria-controls="collapseExample">
+                    Фильтры
+                </a>
+            </p>
+            <div class="collapse" id="collapseExample">
+                <div class="card card-body">
+                    <form action="{% url 'filter' %}" method="get" name="filter">
+                        <div class="row justify-content-start">
+                            <div class="col-4">
+                                <strong>Жанры</strong>
+                                <ul class="list-group-item">
+                                    {% for genre in view.get_genres %}
+                                        <li class="list-group-item">
+                                            <input type="checkbox" class="form-check-input me-1" name="genre" value="{{ genre.id }}">
+                                            <label class="form-check-label" >{{ genre }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-4">
+                                <strong>Авторы</strong>
+                                <ul class="list-group-item">
+                                    {% for author in view.get_authors %}
+                                        <li class="list-group-item">
+                                            <input type="checkbox" class="form-check-input me-1" name="author" value="{{ author.id }}">
+                                            <label class="form-check-label" >{{ author }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-secondary">Применить фильтры</button>
+                    </form>
+
+                </div>
+            </div>
+            <ul class="list-group">
+                {% for book in books %}
+                    <li class="list-group-item list-group-item-action list-group-item-light">
+                        <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link"><p>{{ book }}</p></a>
+                    </li>
             {% endfor %}
+            </ul>
         </div>
     </article>
 {% include 'base/pagination.html' %}

@@ -33,3 +33,8 @@ class AuthorCreate(forms.ModelForm):
         if data == 'А Б В':
             raise ValidationError('Автор с таким именем уже существует!')
         return data
+
+
+class FilterForm(forms.Form):
+    publishers = forms.ModelMultipleChoiceField(queryset=Author.objects.all(), required=False)
+    authors = forms.ModelMultipleChoiceField(queryset=Genre.objects.all(), required=False)
