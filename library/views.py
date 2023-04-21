@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
+from django.views.generic.list import ListView, MultipleObjectMixin
 from .models import Author, Book, Genre
 from .forms import BookCreate, AuthorCreate
 from django.contrib import messages
@@ -67,13 +67,14 @@ def author_create(request):
     return render(request, 'author/author_create.html', {'form': form})
 
 
-class AuthorDetailView(DetailView):
+class AuthorDetailView(DetailView, MultipleObjectMixin):
     model = Author
     template_name = 'author/author_detail.html'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['book_list'] = Book.objects.filter(author=self.kwargs['pk'])
+        object_list = Book.objects.filter(author=self.kwargs['pk'])
+        context = super(AuthorDetailView, self).get_context_data(object_list=object_list, **kwargs)
         return context
 
 
