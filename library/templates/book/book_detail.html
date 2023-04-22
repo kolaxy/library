@@ -4,10 +4,17 @@
     <article class="media content-section">
         <div class="media-body">
             <legend class="border-bottom mb-4">{{ object.name }}</legend>
+            {{ request.session.keys }}
+            {{ favorites.list }}
+            {{ request.session.favorites }}
+            <p>___</p>
+
             <p>Автор : {{ object.author }}</p>
             <p>Жанр: {{ object.genre }}</p>
             <p>ISBN : {{ object.isbn }}</p>
             <p>{{ object.annotation }}</p>
+            {% include "favorites/includes/add_to_favorites.html" with type="library" id=book.id %}
+            {% include "favorites/includes/remove_from_favorites.html" with type="library" id=book.id %}
         </div>
     </article>
 {% endblock content %}
