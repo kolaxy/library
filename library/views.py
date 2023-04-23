@@ -73,6 +73,16 @@ class BookDetailView(DetailView):
     model = Book
     template_name = 'book/book_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        fav = bool
+        book = get_object_or_404(Book, id=self.kwargs['pk'])
+        if book.favourites.filter(id=self.request.user.id).exists():
+            fav = True
+        context['fav'] = fav
+        # self.request.user.id
+        return context
+
 
 class BookListView(GenreAuthor, ListView):
     model = Book

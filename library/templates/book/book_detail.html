@@ -9,7 +9,11 @@
             <p>ISBN : {{ object.isbn }}</p>
             <p>{{ object.annotation }}</p>
             {% if user.is_authenticated %}
-                <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary">Добавить в избранное</a>
+                {% if not fav %}
+                    <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary">Добавить в избранное</a>
+                {% else %}
+                    <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary">Удалить из избранного</a>
+                {% endif %}
             {% endif %}
         </div>
     </article>
