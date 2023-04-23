@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from library.models import *
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def register(request):
@@ -60,6 +61,9 @@ def favourite_add(request, id):
 @login_required
 def favourite_list(request):
     books = Book.objects.filter(favourites=request.user)
+    paginator = Paginator(books, 6)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
     return render(request,
                   'users/favourites.html',
-                  {'books': books})
+                  {'books': books, "page_obj": page_obj})
