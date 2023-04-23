@@ -3,6 +3,10 @@ from django.contrib import messages
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from library.models import *
 
 
 def register(request):
@@ -41,3 +45,21 @@ def profile(request):
     }
 
     return render(request, 'users/profile.html', context)
+
+
+@login_required
+def favourite_add(request, id):
+    book = get_object_or_404(Book, id=id)
+    if book.favourites.filter(id=request.user.id).exists():
+        book.favourites.remove(request.user)
+    else:
+        book.favourites.add(request.user)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def favourite_list(request):
+    books = Book.objects.filter(favourites=request.user)
+    return render(request,
+                  'users/favourites.html',
+                  {'books': books})

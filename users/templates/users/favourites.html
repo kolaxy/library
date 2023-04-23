@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Users Favourties{% endblock %}
+{% block content %}
+<legend class="border-bottom mb-4">Избранное</legend>
+<div class="container">
+    <div>
+        <div class="row">
+            {% for book in books %}
+            <div class="col-md-4">
+                <a a class="nav-item nav-link" href="{{ book.get_absolute_url}}">
+                    <div class="card mb-4 box-shadow">
+<!--                        <img class="card-img-top" src="{{ book.image.url }}" alt="{{ post.title }}">-->
+                        <div class="card-body">
+                            <h2 style="font-size:18px;font-weight:bold">{{ book }}</h2>
+                            <p>{{ book.author }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ book.genre }}</small>
+                                <div id="favourite-section"><a href="{% url 'favourite-add' book.id %}"
+                                        class="btn btn-outline-secondary">Удалить</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -31,10 +31,12 @@
                                             <button class="btn btn-outline-secondary" type="submit">Найти</button>
                                         </form>
                                     </li>
-                                    <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'book-create' %}">Добавить книгу</a></li>
-                                    <li class="list-group-item list-group-item-light">Announcements</li>
-                                    <li class="list-group-item list-group-item-light">Calendars</li>
-                                    <li class="list-group-item list-group-item-light">etc</li>
+                                    {% if user.is_authenticated %}
+                                        <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'book-create' %}">Добавить книгу</a></li>
+                                        <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'favourite-list' %}">Избранные книги</li>
+                                        <li class="list-group-item list-group-item-light">Calendars</li>
+                                        <li class="list-group-item list-group-item-light">etc</li>
+                                    {% endif %}
                                 </ul>
                         </div>
                     </div>

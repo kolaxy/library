@@ -1,5 +1,0 @@
-<form action="{% url 'favorites:add' id=id %}" method="post">{% csrf_token %}
-    <input type="hidden" name="type" value="{{ type }}">
-    <input type="hidden" name="url-from" value="{{ request.path }}">
-    <button type="submit" class="btn btn-success">Добавить в закладки</button>
-</form>

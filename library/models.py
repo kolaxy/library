@@ -31,6 +31,7 @@ class Book(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     is_archive = models.BooleanField(default=False)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    favourites = models.ManyToManyField(User, related_name='favourite', default=None, blank=True)
 
     def __str__(self):
         return self.name

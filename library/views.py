@@ -1,11 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView, MultipleObjectMixin
 from .models import Author, Book, Genre
 from .forms import BookCreate, AuthorCreate
 from django.contrib import messages
 from django.db.models import Q
-from django.core.paginator import Paginator
 
 
 def home(request):

@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'library',
     'users',
-    'favorites',
     'crispy_bootstrap4',
     'crispy_forms',
 

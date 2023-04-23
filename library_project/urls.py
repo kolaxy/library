@@ -26,8 +26,9 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
     path('profile/', user_views.profile, name='profile'),
+    path('favourites/', user_views.favourite_list, name='favourite-list'),
+    path('fav/<int:id>/', user_views.favourite_add, name='favourite-add'),
     path('', include('library.urls')),
-    path('', include('favorites.urls')),
 ]
 
 if settings.DEBUG:
