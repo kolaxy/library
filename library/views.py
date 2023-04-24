@@ -108,7 +108,7 @@ def author_create(request):
 class AuthorDetailView(DetailView, MultipleObjectMixin):
     model = Author
     template_name = 'author/author_detail.html'
-    paginate_by = 5
+    paginate_by = 6
 
     def get_context_data(self, **kwargs):
         object_list = Book.objects.filter(author=self.kwargs['pk'])

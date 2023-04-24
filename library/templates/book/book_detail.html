@@ -1,22 +1,17 @@
 {% extends "base.html" %}
 {% block title %}{{ object.name }}{% endblock %}
 {% block content %}
-    <article class="media content-section">
-        <div class="media-body">
-            <legend class="border-bottom mb-4">{{ object.name }}</legend>
-            <img width="200" height="300" src="{{ book.image.url }}">
-            <p>Автор : {{ object.author }}</p>
-            <p>Жанр: {{ object.genre }}</p>
-            <p>ISBN : {{ object.isbn }}</p>
-            <p>{{ object.annotation }}</p>
-            {% if user.is_authenticated %}
-                {% if not fav %}
-                    <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary">Добавить в избранное</a>
-                {% else %}
-                    <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary">Удалить из избранного</a>
-                {% endif %}
-            {% endif %}
+<legend class="border-bottom mb-4">{{ object.name }}</legend>
+    <div class="row">
+        <div class="col-4">
+            <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="{{ book.image.url }}">
         </div>
-
-    </article>
+        <div class="col-8">
+        <p>Автор : {{ object.author }}</p>
+        <p>Жанр: {{ object.genre }}</p>
+        <p>ISBN : {{ object.isbn }}</p>
+        <p>{{ object.annotation }}</p>
+        </div>
+    </div>
+<legend class="border-bottom mb-4">Рецензии читателей</legend>
 {% endblock content %}

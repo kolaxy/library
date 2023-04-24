@@ -42,13 +42,24 @@
 
                 </div>
             </div>
-            <ul class="list-group">
+            <div class="row">
                 {% for book in books %}
-                    <li class="list-group-item list-group-item-action list-group-item-light">
-                        <a href="{% url 'book-detail' book.id %}" class="nav-item nav-link"><p>{{ book }}</p></a>
-                    </li>
-            {% endfor %}
-            </ul>
+                    <div class="col-md-4">
+                        <a class="nav-item nav-link" href="{{ book.get_absolute_url}}">
+                            <div class="card mb-4 box-shadow">
+                                <img class="card-img-top" src="{{ book.image.url }}">
+                                <div class="card-body">
+                                    <h2 style="font-size:18px;font-weight:bold">{{ book }}</h2>
+                                    <p>{{ book.author }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">{{ book.genre }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </article>
 {% include 'base/pagination.html' %}
