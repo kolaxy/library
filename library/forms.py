@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 class BookCreate(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['name', 'genre', 'author', 'isbn', 'annotation', 'image']
+        fields = ['name', 'genre', 'author', 'isbn', 'annotation', 'image', ]
 
         widgets = {
             "name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название'}),
@@ -20,7 +20,7 @@ class BookCreate(forms.ModelForm):
 class AuthorCreate(forms.ModelForm):
     class Meta:
         model = Author
-        fields = ['surname', 'name', 'family_name']
+        fields = ['surname', 'name', 'family_name', ]
 
         widgets = {
             "surname": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите фамилию'}),
@@ -32,3 +32,14 @@ class AuthorCreate(forms.ModelForm):
 class FilterForm(forms.Form):
     publishers = forms.ModelMultipleChoiceField(queryset=Author.objects.all(), required=False)
     authors = forms.ModelMultipleChoiceField(queryset=Genre.objects.all(), required=False)
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['name', 'body', ]
+
+        widgets = {
+            "name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Краткое резюме'}),
+            "body": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Текст рецензии'}),
+        }

@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView, MultipleObjectMixin
-from .models import Author, Book, Genre
-from .forms import BookCreate, AuthorCreate
+from .models import Author, Book, Genre, Comment
+from .forms import BookCreate, AuthorCreate, CommentForm
 from django.contrib import messages
 from django.db.models import Q
+from django.views.generic.edit import FormMixin
 
 
 def home(request):
@@ -69,9 +71,13 @@ def book_create(request):
     return render(request, 'book/book_create.html', {'form': form})
 
 
-class BookDetailView(DetailView):
+class BookDetailView(FormMixin, DetailView):
     model = Book
     template_name = 'book/book_detail.html'
+    form_class = CommentForm
+
+    def get_success_url(self):
+        return reverse_lazy('book-detail', kwargs={'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,15 +86,31 @@ class BookDetailView(DetailView):
         if book.favourites.filter(id=self.request.user.id).exists():
             fav = True
         context['fav'] = fav
-        # self.request.user.id
+        context['comments'] = Comment.objects.filter(book=self.kwargs['pk'])
+        context['form'] = CommentForm(initial={'book': self.object})
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            form.instance.creator = request.user
+            form.instance.book = Book.objects.get(id=self.kwargs['pk'])
+            messages.success(request, f'Ваш комментарий создан.')
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.save()
+        return super(BookDetailView, self).form_valid(form)
 
 
 class BookListView(GenreAuthor, ListView):
     model = Book
     context_object_name = 'books'
     template_name = 'book/book_list.html'
-    paginate_by = 10
+    paginate_by = 9
 
 
 def author_create(request):

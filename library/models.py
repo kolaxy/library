@@ -65,3 +65,14 @@ class Book(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+
+
+class Comment(models.Model):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    body = models.TextField(max_length=1100)
+    creation_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.book.name}, {self.name}"
