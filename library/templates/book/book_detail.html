@@ -4,6 +4,7 @@
     <article class="media content-section">
         <div class="media-body">
             <legend class="border-bottom mb-4">{{ object.name }}</legend>
+            <img width="200" height="300" src="{{ book.image.url }}">
             <p>Автор : {{ object.author }}</p>
             <p>Жанр: {{ object.genre }}</p>
             <p>ISBN : {{ object.isbn }}</p>
@@ -16,5 +17,6 @@
                 {% endif %}
             {% endif %}
         </div>
+
     </article>
 {% endblock content %}

@@ -11,7 +11,7 @@
 }
 </style>
 <legend class="border-bottom mb-4">Добавить книгу</legend>
-<form class="row g-3" method="POST">
+<form class="row g-3" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="col-md-6">
         <label for="name" class="form-label">Название книги</label>
@@ -42,6 +42,11 @@
     <div class="col-md-12">
         <label for="annotation" class="form-label">Аннотация</label>
         {{ form.annotation }}
+        {{ form.annotation.errors }}
+    </div>
+        <div class="col-md-12">
+        <label for="image" class="form-label">Изображение ( Необязательное поле )</label>
+        {{ form.image }}
         {{ form.annotation.errors }}
     </div>
     <div class="col-12">

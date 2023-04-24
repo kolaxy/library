@@ -4,8 +4,12 @@ from PIL import Image
 
 
 class Profile(models.Model):
+
+    def upload_to(self, filename):
+        return f'profile_pics/{self.pk}/{filename}'
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+    image = models.ImageField(default='profile_pics/default.jpg', upload_to=upload_to)
 
     def __str__(self):
         return f'Профиль {self.user.username}'

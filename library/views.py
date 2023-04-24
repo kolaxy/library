@@ -57,7 +57,7 @@ class FilterBooksView(GenreAuthor, ListView):
 
 def book_create(request):
     if request.method == 'POST':
-        form = BookCreate(request.POST)
+        form = BookCreate(request.POST, request.FILES)
         if form.is_valid():
             form.instance.creator = request.user
             form.save()
