@@ -16,6 +16,7 @@ urlpatterns = [
     path('books/<int:pk>/', BookDetailView.as_view(), name='book-detail'),
     path('books/new/', views.book_create, name='book-create'),
     path('books/<int:id>/edit/', views.book_update, name='book-update'),
+    path('books/<int:id>/delete/', views.book_delete, name='book-delete'),
 
     path('authors/', AuthorListView.as_view(), name='authors'),
     path('authors/new/', views.author_create, name='author-create'),
@@ -29,4 +30,5 @@ urlpatterns = [
 
     path('archive/comments/', views.CommentArchiveView.as_view(), name='comments-archive'),
     path('archive/comment/<int:id>/restore/', views.comment_restore, name='comment-restore'),
+    path('archive/books/', views.BookArchiveView.as_view(), name='books-archive')
 ]

@@ -47,6 +47,7 @@ class Book(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     favourites = models.ManyToManyField(User, related_name='favourite', default=None, blank=True)
     image = models.ImageField(default='book_pics/default.jpg', upload_to=upload_to, null=True, blank=True)
+    deletion_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name

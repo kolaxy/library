@@ -90,6 +90,28 @@ def book_update(request, id):
     return render(request, 'book/book_create.html', {'book': book, 'form': form})
 
 
+def book_delete(request, id):
+    try:
+        book = Book.objects.get(pk=id)
+        book.is_archive = True
+        book.deletion_date = now()
+        book.save()
+        return redirect(request.META['HTTP_REFERER'])
+    except Comment.DoesNotExist:
+        return HttpResponseNotFound("<h2>Comment not found</h2>")
+
+
+def comment_restore(request, id):
+    try:
+        comment = Comment.objects.get(id=id)
+        comment.is_archive = False
+        comment.deletion_date = None
+        comment.save()
+        return redirect(request.META['HTTP_REFERER'])
+    except Comment.DoesNotExist:
+        return HttpResponseNotFound("<h2>Comment not found</h2>")
+
+
 class BookDetailView(FormMixin, DetailView):
     model = Book
     template_name = 'book/book_detail.html'
@@ -206,3 +228,15 @@ class CommentArchiveView(LoginRequiredMixin, ListView):
     context_object_name = 'comments'
     template_name = 'comment/comments_archive.html'
     paginate_by = 10
+
+
+class BookArchiveView(LoginRequiredMixin, ListView):
+    model = Book
+    queryset = Book.objects.filter(is_archive=True)
+    context_object_name = 'books'
+    template_name = 'book/book_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['archive'] = True
+        return context
