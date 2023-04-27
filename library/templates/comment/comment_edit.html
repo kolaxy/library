@@ -4,11 +4,12 @@
 {% load crispy_forms_field %}
 {% load static %}
 {% block content %}
+<legend class="border-bottom mb-4">Редактирование комментария</legend>
 <body>
     <form method="POST">
         {% csrf_token %}
         {{ form|crispy }}
-        <input type="submit" value="Сохранить">
+        <button type="submit" class="save btn btn-secondary">Сохранить</button>
     </form>
 </body>
 {% endblock content %}

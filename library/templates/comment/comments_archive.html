@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Архив комментариев ({{ comments|length }}){% endblock %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_field %}
+{% load static %}
+{% block content %}
+<legend class="border-bottom mb-4">Удаленные комментарии ({{ comments|length }})</legend>
+ <div class="comments-list row g-3">
+        {% for comment in comments %}
+        <article class="media content-section">
+            <div class="box">
+                <p class="entry-title post-title">
+                    <a href="#" class="nav-item nav-link">
+                        <img class="rounded-circle mb-2 ico-ind" width="30" height="30" src="{{ comment.creator.profile.image.url }}" alt="">
+                        {{ comment.creator }} -- {{ comment.creation_time }}
+                    </a>
+                </p>
+            </div>
+            <div class="media-body">
+                    <div class="col">
+                        <h5>Книга : {{ comment.book }}</h5>
+                        <p>Кратко : {{ comment.name }}</p>
+                        <p class="text-break">Аннотация : {{ comment.body }}</p>
+                    </div>
+            </div>
+                <a href="{% url 'comment-restore' comment.id %}">Восстановить</a>
+        </article>
+        {% endfor %}
+    </div>
+{% include 'base/pagination.html' %}
+{% endblock %}

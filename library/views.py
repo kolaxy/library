@@ -14,6 +14,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.views.generic.edit import FormMixin
 from django.core.paginator import Paginator
+from django.utils.timezone import now
+
 
 
 def home(request):
@@ -94,7 +96,7 @@ class BookDetailView(FormMixin, DetailView):
             fav = True
         context['fav'] = fav
         page = self.request.GET.get('page')
-        context['comments'] = Comment.objects.filter(book=self.kwargs['pk']).order_by('-creation_time')
+        context['comments'] = Comment.objects.filter(book=self.kwargs['pk'], is_archive=False).order_by('-creation_time')
         context['form'] = CommentForm(initial={'book': self.object})
         return context
 
@@ -157,6 +159,19 @@ def comment_delete(request, id):
     try:
         comment = Comment.objects.get(id=id)
         comment.is_archive = True
+        print('???')
+        comment.deletion_date = now()
+        comment.save()
+        return redirect(request.META['HTTP_REFERER'])
+    except Comment.DoesNotExist:
+        return HttpResponseNotFound("<h2>Comment not found</h2>")
+
+
+def comment_restore(request, id):
+    try:
+        comment = Comment.objects.get(id=id)
+        comment.is_archive = False
+        comment.deletion_date = None
         comment.save()
         return redirect(request.META['HTTP_REFERER'])
     except Comment.DoesNotExist:
@@ -172,3 +187,11 @@ class CommentEditView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, "Рецензия изменена")
         form.instance.creator = self.request.user
         return super().form_valid(form)
+
+
+class CommentArchiveView(LoginRequiredMixin, ListView):
+    model = Comment
+    queryset = Comment.objects.filter(is_archive=True)
+    context_object_name = 'comments'
+    template_name = 'comment/comments_archive.html'
+    paginate_by = 10

@@ -74,6 +74,7 @@ class Comment(models.Model):
     body = models.TextField(max_length=1100)
     creation_time = models.DateTimeField(auto_now_add=True)
     is_archive = models.BooleanField(default=False)
+    deletion_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.book.name}, {self.name}"

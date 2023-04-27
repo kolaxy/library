@@ -21,10 +21,10 @@
         <p>Автор : {{ object.author }}</p>
         <p>Жанр: {{ object.genre }}</p>
         <p>ISBN : {{ object.isbn }}</p>
-        <p>{{ object.annotation }}</p>
+        <p class="text-break">{{ object.annotation }}</p>
         </div>
     </div>
-<legend class="border-bottom mb-4">Рецензии читателей</legend>
+<legend class="border-bottom mb-4">Рецензии читателей ({{ comments|length }})</legend>
 <form class="row g-3" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="col-md-6">
@@ -59,10 +59,10 @@
             <div class="media-body">
                     <div class="media-body">
                         <h5>{{ comment.name }}</h5>
-                        <p>{{ comment.body }}</p>
+                        <p class="text-break">{{ comment.body }}</p>
                     </div>
             </div>
-                <td><a href="{% url 'comment-edit' comment.id %}">Изменить</a> | <a href="{% url 'comment-delete' comment.id %}">Удалить</a></td>
+            <a href="{% url 'comment-delete' comment.id %}">Удалить</a>
         </article>
         {% endfor %}
     </div>
