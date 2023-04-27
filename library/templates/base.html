@@ -35,6 +35,7 @@
                                         {% if user.groups.get.id == 1 %}
                                             <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Список заявок</a></li>
                                             <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'comments-archive' %}">Архив комментариев</a></li>
+                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'books-archive' %}">Архив книг</a></li>
                                         {% endif %}
                                         <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'book-create' %}">Добавить книгу</a></li>
                                         <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'favourite-list' %}">Избранные книги</li>

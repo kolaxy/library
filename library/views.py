@@ -96,7 +96,19 @@ def book_delete(request, id):
         book.is_archive = True
         book.deletion_date = now()
         book.save()
-        return redirect(request.META['HTTP_REFERER'])
+        return redirect('books')
+    except Book.DoesNotExist:
+        return HttpResponseNotFound("<h2>Book not found</h2>")
+
+
+def book_restore(request, id):
+    try:
+        book = Book.objects.get(id=id)
+        book.is_archive = False
+        book.deletion_date = None
+        book.save()
+        messages.success(request, f'Книга {book} была восстановлена')
+        return redirect('books-archive')
     except Comment.DoesNotExist:
         return HttpResponseNotFound("<h2>Comment not found</h2>")
 
