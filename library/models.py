@@ -73,6 +73,10 @@ class Comment(models.Model):
     name = models.CharField(max_length=255)
     body = models.TextField(max_length=1100)
     creation_time = models.DateTimeField(auto_now_add=True)
+    is_archive = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.book.name}, {self.name}"
+
+    def get_absolute_url(self):
+        return reverse('book-detail', kwargs={'pk': self.book.pk})

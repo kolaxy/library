@@ -5,8 +5,8 @@ from library.views import (
     BookListView,
     AuthorDetailView,
     AuthorListView,
+    CommentEditView
 )
-
 
 urlpatterns = [
     path('', views.home, name='library-home'),
@@ -19,4 +19,6 @@ urlpatterns = [
     path('authors/<int:pk>/', AuthorDetailView.as_view(), name='author-detail'),
     path('search/', views.search, name='search'),
     path('filter/', views.FilterBooksView.as_view(), name='filter'),
+    path('comment/<int:id>/delete/', views.comment_delete, name='comment-delete'),
+    path('comment/<int:pk>/edit/', views.CommentEditView.as_view(), name='comment-edit'),
 ]

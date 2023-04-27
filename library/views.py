@@ -1,12 +1,19 @@
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView, MultipleObjectMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.list import MultipleObjectMixin
+from django.views.generic import (
+    DetailView,
+    ListView,
+    UpdateView,
+)
 from .models import Author, Book, Genre, Comment
 from .forms import BookCreate, AuthorCreate, CommentForm
 from django.contrib import messages
 from django.db.models import Q
 from django.views.generic.edit import FormMixin
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -86,7 +93,8 @@ class BookDetailView(FormMixin, DetailView):
         if book.favourites.filter(id=self.request.user.id).exists():
             fav = True
         context['fav'] = fav
-        context['comments'] = Comment.objects.filter(book=self.kwargs['pk'])
+        page = self.request.GET.get('page')
+        context['comments'] = Comment.objects.filter(book=self.kwargs['pk']).order_by('-creation_time')
         context['form'] = CommentForm(initial={'book': self.object})
         return context
 
@@ -142,4 +150,25 @@ class AuthorListView(ListView):
     model = Author
     context_object_name = 'authors'
     template_name = 'author/author_list.html'
-    paginate_by = 10
+    paginate_by = 9
+
+
+def comment_delete(request, id):
+    try:
+        comment = Comment.objects.get(id=id)
+        comment.is_archive = True
+        comment.save()
+        return redirect(request.META['HTTP_REFERER'])
+    except Comment.DoesNotExist:
+        return HttpResponseNotFound("<h2>Comment not found</h2>")
+
+
+class CommentEditView(LoginRequiredMixin, UpdateView):
+    model = Comment
+    fields = ['name', 'body', ]
+    template_name = 'comment/comment_edit.html'
+
+    def form_valid(self, form):
+        messages.success(self.request, "Рецензия изменена")
+        form.instance.creator = self.request.user
+        return super().form_valid(form)

@@ -62,8 +62,11 @@
                         <p>{{ comment.body }}</p>
                     </div>
             </div>
+                <td><a href="{% url 'comment-edit' comment.id %}">Изменить</a> | <a href="{% url 'comment-delete' comment.id %}">Удалить</a></td>
         </article>
         {% endfor %}
     </div>
 {% endif %}
+{% include 'base/pagination.html' %}
 {% endblock content %}
+

@@ -8,8 +8,10 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from library.models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .decorators import unauthenticated_user
 
 
+@unauthenticated_user
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)

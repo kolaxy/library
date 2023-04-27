@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Edit comment{% endblock %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_field %}
+{% load static %}
+{% block content %}
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Сохранить">
+    </form>
+</body>
+{% endblock content %}
