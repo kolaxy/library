@@ -17,7 +17,6 @@ from django.core.paginator import Paginator
 from django.utils.timezone import now
 
 
-
 def home(request):
     return render(request, 'home.html')
 
@@ -80,6 +79,17 @@ def book_create(request):
     return render(request, 'book/book_create.html', {'form': form})
 
 
+def book_update(request, id):
+    book = Book.objects.get(pk=id)
+    form = BookCreate(request.POST or None, request.FILES or None, instance=book)
+    if form.is_valid():
+        form.instance.creator = request.user
+        form.save()
+        messages.success(request, f'Страница "{form.instance.name}" была обновлена.')
+        return redirect('book-detail', pk=form.instance.pk)
+    return render(request, 'book/book_create.html', {'book': book, 'form': form})
+
+
 class BookDetailView(FormMixin, DetailView):
     model = Book
     template_name = 'book/book_detail.html'
@@ -96,7 +106,8 @@ class BookDetailView(FormMixin, DetailView):
             fav = True
         context['fav'] = fav
         page = self.request.GET.get('page')
-        context['comments'] = Comment.objects.filter(book=self.kwargs['pk'], is_archive=False).order_by('-creation_time')
+        context['comments'] = Comment.objects.filter(book=self.kwargs['pk'], is_archive=False).order_by(
+            '-creation_time')
         context['form'] = CommentForm(initial={'book': self.object})
         return context
 

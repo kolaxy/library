@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Архив комментариев ({{ comments|length }}){% endblock %}
-{% load crispy_forms_tags %}
-{% load crispy_forms_field %}
-{% load static %}
 {% block content %}
 <legend class="border-bottom mb-4">Удаленные комментарии ({{ comments|length }})</legend>
  <div class="comments-list row g-3">

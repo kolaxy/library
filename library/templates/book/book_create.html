@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block title %}Новая книга{% endblock %}
+{% block title %}Книга{% endblock %}
 {% block content %}
 <style>label {
   display: block;
@@ -10,7 +10,7 @@
   float: right;
 }
 </style>
-<legend class="border-bottom mb-4">Добавить книгу</legend>
+<legend class="border-bottom mb-4">Данные книги</legend>
 <form class="row g-3" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="col-md-6">
