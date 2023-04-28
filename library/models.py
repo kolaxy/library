@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from PIL import Image, ImageDraw, ImageFont
+from django.http import JsonResponse
 import os
 import uuid
 
@@ -43,7 +44,11 @@ class Book(models.Model):
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Жанр')
     author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор')
     creation_time = models.DateTimeField(auto_now_add=True)
+
     is_archive = models.BooleanField(default=False)
+    # mode = models.CharField(default='show')
+    # ticket_key = models.IntegerField(default=None)
+
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     favourites = models.ManyToManyField(User, related_name='favourite', default=None, blank=True)
     image = models.ImageField(default='book_pics/default.jpg', upload_to=upload_to, null=True, blank=True)
@@ -82,3 +87,9 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse('book-detail', kwargs={'pk': self.book.pk})
+
+
+class Ticket(models.Model):
+    playload = models.JSONField(default={})
+    creation_time = models.DateTimeField(auto_now_add=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

@@ -15,7 +15,7 @@ urlpatterns = [
     path('books/', BookListView.as_view(), name='books'),
     path('books/<int:pk>/', BookDetailView.as_view(), name='book-detail'),
     path('books/new/', views.book_create, name='book-create'),
-    path('books/<int:id>/edit/', views.book_update, name='book-update'),
+    path('books/<int:id>/edit/', views.book_edit, name='book-edit'),
     path('books/<int:id>/delete/', views.book_delete, name='book-delete'),
     path('books/<int:id>/restore', views.book_restore, name='book-restore'),
 
@@ -31,5 +31,7 @@ urlpatterns = [
 
     path('archive/comments/', views.CommentArchiveView.as_view(), name='comments-archive'),
     path('archive/comment/<int:id>/restore/', views.comment_restore, name='comment-restore'),
-    path('archive/books/', views.BookArchiveView.as_view(), name='books-archive')
+    path('archive/books/', views.BookArchiveView.as_view(), name='books-archive'),
+
+    path('tickets/new/', views.ticket_create, name='ticket-create')
 ]

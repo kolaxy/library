@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{% static 'comments/comments.css' %}">
 <legend class="border-bottom mb-4">{{ object.name }}</legend>
     <div class="row">
-        <div class="col-4">
+        <div class="col">
             <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="{{ book.image.url }}">
             {% if user.is_authenticated %}
                 {% if not fav %}
@@ -17,11 +17,12 @@
                 {% endif %}
             {% endif %}
         </div>
-        <div class="col-8">
-        <p>Автор : {{ object.author }}</p>
-        <p>Жанр: {{ object.genre }}</p>
-        <p>ISBN : {{ object.isbn }}</p>
-        <p class="text-break">{{ object.annotation }}</p>
+        <div class="col">
+            <a href="{% url 'book-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Редактировать</a>
+            <p>Автор : {{ object.author }}</p>
+            <p>Жанр: {{ object.genre }}</p>
+            <p>ISBN : {{ object.isbn }}</p>
+            <p class="text-break">{{ object.annotation }}</p>
         </div>
     </div>
 <legend class="border-bottom mb-4">Рецензии читателей ({{ comments|length }})</legend>

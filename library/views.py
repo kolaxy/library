@@ -1,3 +1,5 @@
+import json
+
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -8,13 +10,14 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
-from .models import Author, Book, Genre, Comment
+from .models import Author, Book, Genre, Comment, Ticket
 from .forms import BookCreate, AuthorCreate, CommentForm
 from django.contrib import messages
 from django.db.models import Q
 from django.views.generic.edit import FormMixin
 from django.core.paginator import Paginator
 from django.utils.timezone import now
+from django.http import JsonResponse
 
 
 def home(request):
@@ -79,7 +82,7 @@ def book_create(request):
     return render(request, 'book/book_create.html', {'form': form})
 
 
-def book_update(request, id):
+def book_edit(request, id):
     book = Book.objects.get(pk=id)
     form = BookCreate(request.POST or None, request.FILES or None, instance=book)
     if form.is_valid():
@@ -252,3 +255,21 @@ class BookArchiveView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['archive'] = True
         return context
+
+
+def ticket_create(request):
+    if request.method == 'POST':
+        form = BookCreate(request.POST, request.FILES)
+        if form.is_valid():
+            form.instance.creator = request.user
+            print(form.cleaned_data)
+            form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
+            form.cleaned_data['author'] = form.cleaned_data['author'].pk
+            ticket_push = Ticket(playload=json.dumps(form.cleaned_data))
+            ticket_push.creator = request.user
+            ticket_push.save()
+            messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
+            return redirect('book-detail', pk=form.instance.pk)
+    else:
+        form = BookCreate()
+    return render(request, 'book/book_create.html', {'form': form})
