@@ -33,5 +33,7 @@ urlpatterns = [
     path('archive/comment/<int:id>/restore/', views.comment_restore, name='comment-restore'),
     path('archive/books/', views.BookArchiveView.as_view(), name='books-archive'),
 
-    path('tickets/new/', views.ticket_create, name='ticket-create')
+    path('tickets/new/book/', views.ticket_book_create, name='ticket-create'),
+    path('tickets/edit/book/<int:id>', views.ticket_book_edit, name='ticket-edit'),
+
 ]

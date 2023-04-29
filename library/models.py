@@ -90,6 +90,7 @@ class Comment(models.Model):
 
 
 class Ticket(models.Model):
-    playload = models.JSONField(default={})
+    playload = models.JSONField(default=dict)
+    parent_key = models.IntegerField(blank=True, null=True)
     creation_time = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

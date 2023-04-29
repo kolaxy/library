@@ -257,7 +257,7 @@ class BookArchiveView(LoginRequiredMixin, ListView):
         return context
 
 
-def ticket_create(request):
+def ticket_book_create(request):
     if request.method == 'POST':
         form = BookCreate(request.POST, request.FILES)
         if form.is_valid():
@@ -270,6 +270,25 @@ def ticket_create(request):
             ticket_push.save()
             messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
             return redirect('book-detail', pk=form.instance.pk)
+    else:
+        form = BookCreate()
+    return render(request, 'book/book_create.html', {'form': form})
+
+
+def ticket_book_edit(request, id):
+    if request.method == 'POST':
+        book = Book.objects.get(pk=id)
+        form = BookCreate(request.POST, request.FILES, instance=id)
+        if form.is_valid():
+            form.instance.creator = request.user
+            print(form.cleaned_data)
+            form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
+            form.cleaned_data['author'] = form.cleaned_data['author'].pk
+            ticket_push = Ticket(playload=json.dumps(form.cleaned_data))
+            ticket_push.creator = request.user
+            ticket_push.save()
+            messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
+            return redirect('book-detail', pk=id)
     else:
         form = BookCreate()
     return render(request, 'book/book_create.html', {'form': form})

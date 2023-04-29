@@ -43,3 +43,9 @@ class CommentForm(forms.ModelForm):
             "name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Краткое резюме'}),
             "body": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Текст рецензии'}),
         }
+
+#
+# class TicketCreate(forms.ModelForm):
+#     class Meta:
+#         model = Ticket
+#         fields =
