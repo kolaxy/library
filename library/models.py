@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 from django.http import JsonResponse
 import os
 import uuid
+from io import BytesIO
 
 
 class Genre(models.Model):
@@ -29,10 +30,13 @@ class Author(models.Model):
 class Book(models.Model):
     @staticmethod
     def get_image_id():
-        queryset = Book.objects.all().order_by('pk')
-        last = queryset.last()
-        last_id = last.id
-        file_number = last_id + 1
+        try:
+            queryset = Book.objects.all().order_by('pk')
+            last = queryset.last()
+            last_id = last.id
+            file_number = last_id + 1
+        except:
+            file_number = 1
         return str(file_number)
 
     def upload_to(self, filename):
@@ -65,12 +69,22 @@ class Book(models.Model):
     ):
         super().save()
 
+        def convert_to_jpeg(im):
+            with BytesIO() as f:
+                im.save(f, format='JPEG')
+                return f.getvalue()
+
         img = Image.open(self.image.path)
 
         if img.height > 300 or img.width > 300:
             output_size = (300, 300)
             img.thumbnail(output_size)
-            img.save(self.image.path)
+            with BytesIO() as self.image.path:
+                img.save(self.image.path, format='JPEG')
+                self.image.path.seek(0)
+                ima_jpg = Image.open(self.image.path)
+                ima_jpg.load()
+
 
 
 class Comment(models.Model):

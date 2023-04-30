@@ -18,6 +18,10 @@ from django.views.generic.edit import FormMixin
 from django.core.paginator import Paginator
 from django.utils.timezone import now
 from django.http import JsonResponse
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
 
 
 def home(request):
@@ -258,16 +262,36 @@ class BookArchiveView(LoginRequiredMixin, ListView):
 
 
 def ticket_book_create(request):
+
+    def get_id():
+        try:
+            queryset = Ticket.objects.all().order_by('pk')
+            last = queryset.last()
+            id_number = last.id + 1
+        except:
+            id_number = 1
+        return str(id_number)
+
     if request.method == 'POST':
         form = BookCreate(request.POST, request.FILES)
         if form.is_valid():
             form.instance.creator = request.user
-            print(form.cleaned_data)
             form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
             form.cleaned_data['author'] = form.cleaned_data['author'].pk
-            ticket_push = Ticket(playload=json.dumps(form.cleaned_data))
+            if request.FILES:
+                data = request.FILES['image']
+                form.cleaned_data.pop('image')
+                path = default_storage.save(f'tickets/books/{get_id()}/image.jpg',
+                                            ContentFile(data.read()))
+                tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+                form.cleaned_data['image'] = f"tickets/books/{get_id()}/image.jpg"
+            else:
+                form.cleaned_data['image'] = f"book_pics/default.jpg"
+            print(form.cleaned_data)
+            ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
             ticket_push.creator = request.user
             ticket_push.save()
+
             messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
             return redirect('book-detail', pk=form.instance.pk)
     else:
@@ -284,7 +308,7 @@ def ticket_book_edit(request, id):
             print(form.cleaned_data)
             form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
             form.cleaned_data['author'] = form.cleaned_data['author'].pk
-            ticket_push = Ticket(playload=json.dumps(form.cleaned_data))
+            ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
             ticket_push.creator = request.user
             ticket_push.save()
             messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
