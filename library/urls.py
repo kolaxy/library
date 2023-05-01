@@ -5,7 +5,10 @@ from library.views import (
     BookListView,
     AuthorDetailView,
     AuthorListView,
-    CommentEditView
+    CommentEditView,
+    TicketListView,
+    TicketDetailView,
+
 )
 
 urlpatterns = [
@@ -33,6 +36,8 @@ urlpatterns = [
     path('archive/comment/<int:id>/restore/', views.comment_restore, name='comment-restore'),
     path('archive/books/', views.BookArchiveView.as_view(), name='books-archive'),
 
+    path('tickets/', TicketListView.as_view(), name='tickets'),
+    path('tickets/<int:pk>/', TicketDetailView.as_view(), name='ticket-details'),
     path('tickets/new/book/', views.ticket_book_create, name='ticket-create'),
     path('tickets/edit/book/<int:id>', views.ticket_book_edit, name='ticket-edit'),
 

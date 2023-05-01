@@ -33,12 +33,13 @@
                                     </li>
                                     {% if user.is_authenticated %}
                                         {% if user.groups.get.id == 1 %}
-                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Список заявок</a></li>
-                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'comments-archive' %}">Архив комментариев</a></li>
-                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'books-archive' %}">Архив книг</a></li>
+                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'tickets' %}">A : Заявки</a></li>
+                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'comments-archive' %}">A : Архив комментариев</a></li>
+                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'books-archive' %}">A : Архив книг</a></li>
+                                            <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'book-create' %}">A : Добавить книгу</a></li>
                                         {% endif %}
-                                        <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'book-create' %}">Добавить книгу</a></li>
-                                        <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'favourite-list' %}">Избранные книги</li>
+                                        <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'ticket-create' %}">Добавить книгу ( Заявка )</a></li>
+                                        <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'favourite-list' %}">Избранные книги</a></li>
                                     {% endif %}
                                 </ul>
                         </div>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Список заявок{% endblock %}
+{% block content %}
+    <legend class="border-bottom mb-4">Список заявок</legend>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Номер</th>
+                <th scope="col">Имя модели</th>
+                <th scope="col">Тип</th>
+                <th scope="col">Дата создания</th>
+                <th scope="col">Пользователь, ID</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% for ticket in tickets %}
+
+                        <tr>
+                            <th scope="row">{{ ticket.0 }}</th>
+                            <td><a href="{% url 'ticket-details' ticket.0 %}">{{ ticket.1.name }}</a></td>
+                            <td>{{ ticket.1.mode }}</td>
+                            <td>{{ ticket.1.creation_time }}</td>
+                            <td>{{ ticket.1.creator }}</td>
+                        </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+{% include 'base/pagination.html' %}
+{% endblock %}

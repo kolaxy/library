@@ -1,5 +1,7 @@
 import json
+from random import randrange
 
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -22,6 +24,9 @@ import os
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
+from datetime import datetime
+import shutil
+from pathlib import Path
 
 
 def home(request):
@@ -60,12 +65,10 @@ class FilterBooksView(GenreAuthor, ListView):
 
     def get_queryset(self):
         if 'genre' in self.request.GET and 'author' in self.request.GET:
-            print('if genre and author')
             queryset = Book.objects.filter(
                 Q(author__in=self.request.GET.getlist("author")), Q(genre__in=self.request.GET.getlist("genre"))
             )
         else:
-            print('else')
             queryset = Book.objects.filter(
                 Q(author__in=self.request.GET.getlist("author")) | Q(genre__in=self.request.GET.getlist("genre"))
             )
@@ -211,7 +214,6 @@ def comment_delete(request, id):
     try:
         comment = Comment.objects.get(id=id)
         comment.is_archive = True
-        print('???')
         comment.deletion_date = now()
         comment.save()
         return redirect(request.META['HTTP_REFERER'])
@@ -261,8 +263,92 @@ class BookArchiveView(LoginRequiredMixin, ListView):
         return context
 
 
-def ticket_book_create(request):
+class TicketListView(ListView):
+    model = Ticket
+    context_object_name = 'tickets'
+    template_name = 'ticket/tickets_list.html'
+    paginate_by = 10
 
+    def get_queryset(self):
+        return [(ticket.pk, json.loads(ticket.playload)) for ticket in Ticket.objects.filter(is_archive=False).order_by('-pk')]
+
+
+class TicketDetailView(DetailView):
+    model = Ticket
+    context_object_name = 'ticket'
+    template_name = 'ticket/ticket.html'
+
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get('pk')
+        ticket = Ticket.objects.get(pk=pk)
+        ticket = (ticket.pk, json.loads(ticket.playload))
+        return ticket
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['author'] = Author.objects.get(pk=kwargs['object'][1]['author'])
+        context['genre'] = Genre.objects.get(pk=kwargs['object'][1]['genre'])
+        return context
+
+    def post(self, request, *args, **kwargs):
+        statusAccept = self.request.POST.get("action") == "accept"
+        statusReject = self.request.POST.get("action") == "reject"
+        if statusAccept:
+
+            def isbn_valid(isbn):
+                isbn_list = [bk.isbn for bk in Book.objects.all()]
+                status = False
+                while isbn in isbn_list:
+                    status = True
+                    isbn = str(randrange(1, 9999999999999))
+                return isbn, status
+
+            pk = self.kwargs.get('pk')
+            ticket = Ticket.objects.get(pk=pk)
+            ticket = json.loads(ticket.playload)
+            print(ticket)
+            img = ticket['image'].split('/')[1:]
+            img_to_model = 'book_pics/default.jpg'
+            if img[-1] == 'image.jpg':
+                new_img_dir = os.path.join(settings.MEDIA_ROOT, f'book_pics/{Book.get_image_id()}/')
+                src_dir = os.path.join(settings.MEDIA_ROOT, f'tickets/books/{pk}')
+                dest_dir = new_img_dir
+                files = os.listdir(src_dir)
+                shutil.copytree(src_dir, dest_dir)
+                img_to_model = f'book_pics/{Book.get_image_id()}/image.jpg'
+            isbn_checked = isbn_valid(ticket['isbn'])
+            print(img_to_model)
+            book = Book(
+                name=ticket['name'],
+                genre=Genre.objects.get(pk=ticket['genre']),
+                author=Author.objects.get(pk=ticket['author']),
+                isbn=isbn_checked[0],
+                annotation=ticket['annotation'],
+                image=img_to_model,
+                creator=User.objects.get(pk=ticket['creator']),
+            )
+            book.save()
+            update = Ticket.objects.get(pk=pk)
+            update.is_archive = True
+            update.save()
+            if isbn_checked[1]:
+                messages.warning(request,
+                                 f'''Заявка на создание "{book.name}" была одобрена.
+                                  ISBN БЫЛ ЗАМЕНЕН НА СЛУЧАЙНЫЙ
+                                   ИЗ-ЗА СОВПАДЕНИЯ С СУЩЕСТВУЮЩЕЙ МОДЕЛЬЮ!''')
+            messages.success(request, f'Заявка на создание "{book.name}" была одобрена.')
+            return redirect('book-detail', pk=book.pk)
+        else:
+            pk = self.kwargs.get('pk')
+            ticket = Ticket.objects.get(pk=pk)
+            book_name = json.loads(ticket.playload)['name']
+            ticket.is_archive = True
+            ticket.save()
+            messages.warning(request, f'Заявка на создание "{book_name}" была отклонена.')
+            return redirect('tickets')
+
+
+def ticket_book_create(request):
     def get_id():
         try:
             queryset = Ticket.objects.all().order_by('pk')
@@ -278,22 +364,24 @@ def ticket_book_create(request):
             form.instance.creator = request.user
             form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
             form.cleaned_data['author'] = form.cleaned_data['author'].pk
+            form.cleaned_data['mode'] = 'book_add'
+            form.cleaned_data['creator'] = request.user.id
+            form.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
             if request.FILES:
                 data = request.FILES['image']
                 form.cleaned_data.pop('image')
                 path = default_storage.save(f'tickets/books/{get_id()}/image.jpg',
                                             ContentFile(data.read()))
                 tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-                form.cleaned_data['image'] = f"tickets/books/{get_id()}/image.jpg"
+                form.cleaned_data['image'] = f"media/tickets/books/{get_id()}/image.jpg"
             else:
-                form.cleaned_data['image'] = f"book_pics/default.jpg"
-            print(form.cleaned_data)
+                form.cleaned_data['image'] = f"media/book_pics/default.jpg"
             ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
             ticket_push.creator = request.user
             ticket_push.save()
 
             messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
-            return redirect('book-detail', pk=form.instance.pk)
+            return redirect('library-home')
     else:
         form = BookCreate()
     return render(request, 'book/book_create.html', {'form': form})
@@ -305,7 +393,6 @@ def ticket_book_edit(request, id):
         form = BookCreate(request.POST, request.FILES, instance=id)
         if form.is_valid():
             form.instance.creator = request.user
-            print(form.cleaned_data)
             form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
             form.cleaned_data['author'] = form.cleaned_data['author'].pk
             ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))

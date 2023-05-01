@@ -1,5 +1,21 @@
 {% extends "base.html" %}
-{% block title %}Новая заявка{% endblock %}
+{% block title %}Заявка mode : {{ ticket.1.mode }}{% endblock %}
 {% block content %}
-    <legend class="border-bottom mb-4">Заявка на редактирование</legend>
+    <legend class="border-bottom mb-4">Заявка</legend>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <button type="submit" name="action" value="accept" class="btn btn-success">Одобрить</button>
+        <button type="submit" name="action" value="reject" class="btn btn-danger">Отклонить</button>
+    </form>
+    <div class="pt-3">
+        <p>id заявки : {{ ticket.0 }}</p>
+        <p>Тип заявки : {{ ticket.1.mode }}</p>
+        <p>Название книги : {{ ticket.1.name }}</p>
+        <p>Жанр : {{ genre }}</p>
+        <p>Автор : {{ author }}</p>
+        <p>ISBN : {{ ticket.1.isbn }}</p>
+        <p class="text-break">Аннотация : {{ ticket.1.annotation }}</p>
+        <p>Изображение:</p>
+        <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="/{{ ticket.1.image }}">
+    </div>
 {% endblock %}

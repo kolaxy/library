@@ -75,16 +75,11 @@ class Book(models.Model):
                 return f.getvalue()
 
         img = Image.open(self.image.path)
-
         if img.height > 300 or img.width > 300:
             output_size = (300, 300)
             img.thumbnail(output_size)
-            with BytesIO() as self.image.path:
-                img.save(self.image.path, format='JPEG')
-                self.image.path.seek(0)
-                ima_jpg = Image.open(self.image.path)
-                ima_jpg.load()
-
+            img = img.convert('RGB')
+            img.save(self.image.path)
 
 
 class Comment(models.Model):
@@ -108,3 +103,4 @@ class Ticket(models.Model):
     parent_key = models.IntegerField(blank=True, null=True)
     creation_time = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    is_archive = models.BooleanField(default=False)
