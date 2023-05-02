@@ -40,7 +40,10 @@ class Book(models.Model):
         return str(file_number)
 
     def upload_to(self, filename):
-        return f'book_pics/{self.get_image_id()}/{filename}'
+        try:
+            return f'book_pics/{self.pk}/{filename}'
+        except:
+            return f'book_pics/{self.get_image_id()}/{filename}'
 
     name = models.CharField('Название книги', max_length=30)
     annotation = models.TextField('Аннотация', max_length=1100)

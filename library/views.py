@@ -270,7 +270,8 @@ class TicketListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return [(ticket.pk, json.loads(ticket.playload)) for ticket in Ticket.objects.filter(is_archive=False).order_by('-pk')]
+        return [(ticket.pk, json.loads(ticket.playload)) for ticket in
+                Ticket.objects.filter(is_archive=False).order_by('-pk')]
 
 
 class TicketDetailView(DetailView):
@@ -288,6 +289,9 @@ class TicketDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['author'] = Author.objects.get(pk=kwargs['object'][1]['author'])
         context['genre'] = Genre.objects.get(pk=kwargs['object'][1]['genre'])
+        if kwargs['object'][1]['mode'] == 'book_edit':
+            context['parent_model'] = Book.objects.get(pk=kwargs['object'][1]['id'])
+            print(context['parent_model'].image)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -306,7 +310,6 @@ class TicketDetailView(DetailView):
             pk = self.kwargs.get('pk')
             ticket = Ticket.objects.get(pk=pk)
             ticket = json.loads(ticket.playload)
-            print(ticket)
             img = ticket['image'].split('/')[1:]
             img_to_model = 'book_pics/default.jpg'
             if img[-1] == 'image.jpg':
@@ -317,7 +320,6 @@ class TicketDetailView(DetailView):
                 shutil.copytree(src_dir, dest_dir)
                 img_to_model = f'book_pics/{Book.get_image_id()}/image.jpg'
             isbn_checked = isbn_valid(ticket['isbn'])
-            print(img_to_model)
             book = Book(
                 name=ticket['name'],
                 genre=Genre.objects.get(pk=ticket['genre']),
@@ -388,18 +390,42 @@ def ticket_book_create(request):
 
 
 def ticket_book_edit(request, id):
-    if request.method == 'POST':
-        book = Book.objects.get(pk=id)
-        form = BookCreate(request.POST, request.FILES, instance=id)
-        if form.is_valid():
-            form.instance.creator = request.user
-            form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
-            form.cleaned_data['author'] = form.cleaned_data['author'].pk
-            ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
-            ticket_push.creator = request.user
-            ticket_push.save()
-            messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
-            return redirect('book-detail', pk=id)
-    else:
-        form = BookCreate()
-    return render(request, 'book/book_create.html', {'form': form})
+    def get_id():
+        try:
+            queryset = Ticket.objects.all().order_by('pk')
+            last = queryset.last()
+            id_number = last.id + 1
+        except:
+            id_number = 1
+        return str(id_number)
+
+    book = Book.objects.get(pk=id)
+    form = BookCreate(request.POST or None, request.FILES or None, instance=book)
+
+    if form.is_valid():
+        form.instance.creator = request.user
+        form.cleaned_data['id'] = id
+        form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
+        form.cleaned_data['author'] = form.cleaned_data['author'].pk
+        form.cleaned_data['mode'] = 'book_edit'
+        form.cleaned_data['creator'] = request.user.id
+        form.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        if request.FILES:
+            data = request.FILES['image']
+            form.cleaned_data.pop('image')
+            path = default_storage.save(f'tickets/books/{get_id()}/image.jpg',
+                                        ContentFile(data.read()))
+            tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+            form.cleaned_data['image'] = f"media/tickets/books/{get_id()}/image.jpg"
+        else:
+            if os.path.isdir(f'media/book_pics/{id}'):
+                form.cleaned_data['image'] = f'media/{str(Book.objects.get(pk=id).image)}'
+                print(f'media/{str(Book.objects.get(pk=id).image)}')
+            else:
+                form.cleaned_data['image'] = f"media/book_pics/default.jpg"
+        ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
+        ticket_push.creator = request.user
+        ticket_push.save()
+        messages.success(request, f'Заявка на обновление "{form.instance.name}" была создана.')
+        return redirect('book-detail', pk=form.instance.pk)
+    return render(request, 'book/book_create.html', {'book': book, 'form': form})
