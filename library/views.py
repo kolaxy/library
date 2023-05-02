@@ -27,6 +27,8 @@ from django.conf import settings
 from datetime import datetime
 import shutil
 from pathlib import Path
+import uuid
+from time import time
 
 
 def home(request):
@@ -297,49 +299,103 @@ class TicketDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         statusAccept = self.request.POST.get("action") == "accept"
         statusReject = self.request.POST.get("action") == "reject"
+        print(json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'])
         if statusAccept:
+            if json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'] == 'book_add':
+                def isbn_valid(isbn):
+                    isbn_list = [bk.isbn for bk in Book.objects.all()]
+                    status = False
+                    while isbn in isbn_list:
+                        status = True
+                        isbn = str(randrange(1, 9999999999999))
+                    return isbn, status
 
-            def isbn_valid(isbn):
-                isbn_list = [bk.isbn for bk in Book.objects.all()]
-                status = False
-                while isbn in isbn_list:
-                    status = True
-                    isbn = str(randrange(1, 9999999999999))
-                return isbn, status
+                pk = self.kwargs.get('pk')
+                ticket = Ticket.objects.get(pk=pk)
+                ticket = json.loads(ticket.playload)
+                img = ticket['image'].split('/')[1:]
+                img_to_model = 'book_pics/default.jpg'
+                if img[-1] == 'image.jpg':
+                    new_img_dir = os.path.join(settings.MEDIA_ROOT, f'book_pics/{Book.get_image_id()}/')
+                    src_dir = os.path.join(settings.MEDIA_ROOT, f'tickets/books/{pk}')
+                    dest_dir = new_img_dir
+                    files = os.listdir(src_dir)
+                    shutil.copytree(src_dir, dest_dir)
+                    img_to_model = f'book_pics/{Book.get_image_id()}/image.jpg'
+                isbn_checked = isbn_valid(ticket['isbn'])
+                book = Book(
+                    name=ticket['name'],
+                    genre=Genre.objects.get(pk=ticket['genre']),
+                    author=Author.objects.get(pk=ticket['author']),
+                    isbn=isbn_checked[0],
+                    annotation=ticket['annotation'],
+                    image=img_to_model,
+                    creator=User.objects.get(pk=ticket['creator']),
+                )
+                book.save()
+                update = Ticket.objects.get(pk=pk)
+                update.is_archive = True
+                update.save()
+                if isbn_checked[1]:
+                    messages.warning(request,
+                                     f'''Заявка на создание "{book.name}" была одобрена.
+                                      ISBN БЫЛ ЗАМЕНЕН НА СЛУЧАЙНЫЙ
+                                       ИЗ-ЗА СОВПАДЕНИЯ С СУЩЕСТВУЮЩЕЙ МОДЕЛЬЮ!''')
+                messages.success(request, f'Заявка на создание "{book.name}" была одобрена.')
+                return redirect('book-detail', pk=book.pk)
 
-            pk = self.kwargs.get('pk')
-            ticket = Ticket.objects.get(pk=pk)
-            ticket = json.loads(ticket.playload)
-            img = ticket['image'].split('/')[1:]
-            img_to_model = 'book_pics/default.jpg'
-            if img[-1] == 'image.jpg':
-                new_img_dir = os.path.join(settings.MEDIA_ROOT, f'book_pics/{Book.get_image_id()}/')
-                src_dir = os.path.join(settings.MEDIA_ROOT, f'tickets/books/{pk}')
-                dest_dir = new_img_dir
-                files = os.listdir(src_dir)
-                shutil.copytree(src_dir, dest_dir)
-                img_to_model = f'book_pics/{Book.get_image_id()}/image.jpg'
-            isbn_checked = isbn_valid(ticket['isbn'])
-            book = Book(
-                name=ticket['name'],
-                genre=Genre.objects.get(pk=ticket['genre']),
-                author=Author.objects.get(pk=ticket['author']),
-                isbn=isbn_checked[0],
-                annotation=ticket['annotation'],
-                image=img_to_model,
-                creator=User.objects.get(pk=ticket['creator']),
-            )
-            book.save()
-            update = Ticket.objects.get(pk=pk)
-            update.is_archive = True
-            update.save()
-            if isbn_checked[1]:
-                messages.warning(request,
-                                 f'''Заявка на создание "{book.name}" была одобрена.
-                                  ISBN БЫЛ ЗАМЕНЕН НА СЛУЧАЙНЫЙ
-                                   ИЗ-ЗА СОВПАДЕНИЯ С СУЩЕСТВУЮЩЕЙ МОДЕЛЬЮ!''')
-            messages.success(request, f'Заявка на создание "{book.name}" была одобрена.')
-            return redirect('book-detail', pk=book.pk)
+            elif json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'] == 'book_edit':
+                def isbn_valid(isbn):
+                    isbn_list = [bk.isbn for bk in Book.objects.all() if bk.pk != self.kwargs['pk']]
+                    status = False
+                    while isbn in isbn_list:
+                        status = True
+                        isbn = str(randrange(1, 9999999999999))
+                    return isbn, status
+
+                pk = self.kwargs.get('pk')
+                ticket = Ticket.objects.get(pk=pk)
+                ticket = json.loads(ticket.playload)
+                img = ticket['image'].split('/')[1:]
+                img_to_model = 'book_pics/default.jpg'
+                if img[-1] == 'image.jpg':
+                    try:
+                        new_img_dir = os.path.join(settings.MEDIA_ROOT, f'book_pics/{ticket["id"]}/')
+                    except:
+                        pass
+                    src_dir = os.path.join(settings.MEDIA_ROOT, f'tickets/books/{pk}')
+                    dest_dir = new_img_dir
+                    files = os.listdir(src_dir)
+                    if os.path.isfile(f'media/book_pics/{ticket["id"]}/image.jpg'):
+                        future_name = int(time())
+                        os.rename(f'media/book_pics/{ticket["id"]}/image.jpg', f'media/book_pics/{ticket["id"]}/{future_name}.jpg')
+                        img_to_model = f'media/book_pics/{ticket["id"]}/image.jpg', f'media/book_pics/{ticket["id"]}/{future_name}.jpg'
+                    else:
+                        img_to_model = f'book_pics/{ticket["id"]}/image.jpg'
+                    print(src_dir)
+                    print(dest_dir)
+                    shutil.copytree(src_dir, dest_dir,dirs_exist_ok=True)
+                isbn_checked = isbn_valid(ticket['isbn'])
+                book = Book.objects.get(pk=ticket["id"])
+                book.name = ticket['name']
+                book.genre = Genre.objects.get(pk=ticket['genre'])
+                book.author = Author.objects.get(pk=ticket['author'])
+                book.isbn = isbn_checked[0]
+                book.annotation = ticket['annotation']
+                book.image = img_to_model
+                book.creator = User.objects.get(pk=ticket['creator'])
+                book.save()
+                update = Ticket.objects.get(pk=pk)
+                update.is_archive = True
+                update.save()
+                if isbn_checked[1]:
+                    messages.warning(request,
+                                     f'''Заявка на изменение "{book.name}" была одобрена.
+                                      ISBN БЫЛ ЗАМЕНЕН НА СЛУЧАЙНЫЙ
+                                       ИЗ-ЗА СОВПАДЕНИЯ С СУЩЕСТВУЮЩЕЙ МОДЕЛЬЮ!''')
+                messages.success(request, f'Заявка на изменение "{book.name}" была одобрена.')
+                return redirect('book-detail', pk=book.pk)
+
         else:
             pk = self.kwargs.get('pk')
             ticket = Ticket.objects.get(pk=pk)
