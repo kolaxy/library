@@ -1,11 +1,12 @@
 import json
 from random import randrange
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.list import MultipleObjectMixin
 from django.views.generic import (
     DetailView,
@@ -77,6 +78,7 @@ class FilterBooksView(GenreAuthor, ListView):
         return queryset
 
 
+@login_required
 def book_create(request):
     if request.method == 'POST':
         form = BookCreate(request.POST, request.FILES)
@@ -91,6 +93,7 @@ def book_create(request):
     return render(request, 'book/book_create.html', {'form': form})
 
 
+@login_required
 def book_edit(request, id):
     book = Book.objects.get(pk=id)
     form = BookCreate(request.POST or None, request.FILES or None, instance=book)
@@ -102,6 +105,7 @@ def book_edit(request, id):
     return render(request, 'book/book_create.html', {'book': book, 'form': form})
 
 
+@login_required
 def book_delete(request, id):
     try:
         book = Book.objects.get(pk=id)
@@ -113,6 +117,7 @@ def book_delete(request, id):
         return HttpResponseNotFound("<h2>Book not found</h2>")
 
 
+@login_required
 def book_restore(request, id):
     try:
         book = Book.objects.get(id=id)
@@ -125,6 +130,7 @@ def book_restore(request, id):
         return HttpResponseNotFound("<h2>Comment not found</h2>")
 
 
+@login_required
 def comment_restore(request, id):
     try:
         comment = Comment.objects.get(id=id)
@@ -212,6 +218,7 @@ class AuthorListView(ListView):
     paginate_by = 9
 
 
+@login_required
 def comment_delete(request, id):
     try:
         comment = Comment.objects.get(id=id)
@@ -223,6 +230,7 @@ def comment_delete(request, id):
         return HttpResponseNotFound("<h2>Comment not found</h2>")
 
 
+@login_required
 def comment_restore(request, id):
     try:
         comment = Comment.objects.get(id=id)
@@ -245,19 +253,21 @@ class CommentEditView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class CommentArchiveView(LoginRequiredMixin, ListView):
+class CommentArchiveView(PermissionRequiredMixin, ListView):
     model = Comment
     queryset = Comment.objects.filter(is_archive=True)
     context_object_name = 'comments'
     template_name = 'comment/comments_archive.html'
     paginate_by = 10
+    permission_required = 'comment.can_view_comment'
 
 
-class BookArchiveView(LoginRequiredMixin, ListView):
+class BookArchiveView(PermissionRequiredMixin, ListView):
     model = Book
     queryset = Book.objects.filter(is_archive=True)
     context_object_name = 'books'
     template_name = 'book/book_list.html'
+    permission_required = 'book.can_view_book'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -265,21 +275,23 @@ class BookArchiveView(LoginRequiredMixin, ListView):
         return context
 
 
-class TicketListView(ListView):
+class TicketListView(PermissionRequiredMixin, ListView):
     model = Ticket
     context_object_name = 'tickets'
     template_name = 'ticket/tickets_list.html'
     paginate_by = 10
+    permission_required = 'ticket.can_view_ticket'
 
     def get_queryset(self):
         return [(ticket.pk, json.loads(ticket.playload)) for ticket in
                 Ticket.objects.filter(is_archive=False).order_by('-pk')]
 
 
-class TicketDetailView(DetailView):
+class TicketDetailView(PermissionRequiredMixin, DetailView):
     model = Ticket
     context_object_name = 'ticket'
     template_name = 'ticket/ticket.html'
+    permission_required = 'ticket.can_view_ticket'
 
     def get_object(self, queryset=None):
         pk = self.kwargs.get('pk')
@@ -368,13 +380,14 @@ class TicketDetailView(DetailView):
                     files = os.listdir(src_dir)
                     if os.path.isfile(f'media/book_pics/{ticket["id"]}/image.jpg'):
                         future_name = int(time())
-                        os.rename(f'media/book_pics/{ticket["id"]}/image.jpg', f'media/book_pics/{ticket["id"]}/{future_name}.jpg')
+                        os.rename(f'media/book_pics/{ticket["id"]}/image.jpg',
+                                  f'media/book_pics/{ticket["id"]}/{future_name}.jpg')
                         img_to_model = f'media/book_pics/{ticket["id"]}/image.jpg', f'media/book_pics/{ticket["id"]}/{future_name}.jpg'
                     else:
                         img_to_model = f'book_pics/{ticket["id"]}/image.jpg'
                     print(src_dir)
                     print(dest_dir)
-                    shutil.copytree(src_dir, dest_dir,dirs_exist_ok=True)
+                    shutil.copytree(src_dir, dest_dir, dirs_exist_ok=True)
                 isbn_checked = isbn_valid(ticket['isbn'])
                 book = Book.objects.get(pk=ticket["id"])
                 book.name = ticket['name']
@@ -406,6 +419,7 @@ class TicketDetailView(DetailView):
             return redirect('tickets')
 
 
+@login_required
 def ticket_book_create(request):
     def get_id():
         try:
@@ -445,6 +459,7 @@ def ticket_book_create(request):
     return render(request, 'book/book_create.html', {'form': form})
 
 
+@login_required
 def ticket_book_edit(request, id):
     def get_id():
         try:
