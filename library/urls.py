@@ -25,6 +25,8 @@ urlpatterns = [
     path('authors/', AuthorListView.as_view(), name='authors'),
     path('authors/new/', views.author_create, name='author-create'),
     path('authors/<int:pk>/', AuthorDetailView.as_view(), name='author-detail'),
+    path('authors/<int:id>/edit', views.author_edit, name='author-edit'),
+
 
     path('search/', views.search, name='search'),
     path('filter/', views.FilterBooksView.as_view(), name='filter'),

@@ -22,6 +22,7 @@ class Author(models.Model):
     family_name = models.CharField('Отчество', max_length=30)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     is_archive = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.surname} {self.name} {self.family_name}'

@@ -13,16 +13,22 @@
                 <div class="pt-3">
                     <p>id заявки : {{ ticket.0 }}</p>
                     <p>Тип заявки : {{ ticket.1.mode }}</p>
-                    <p>Название книги : {{ ticket.1.name }}</p>
-                    <p>Жанр : {{ genre }}</p>
-                    <p>Автор : {{ author }}</p>
-                    <p>ISBN : {{ ticket.1.isbn }}</p>
-                    <p class="text-break">Аннотация : {{ ticket.1.annotation }}</p>
-                    <p>Изображение:</p>
-                    <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="/{{ ticket.1.image }}">
+                    {% if ticket.1.mode == 'book_add' or ticket.1.mode == 'book_edit' %}
+                        <h6>Название книги : {{ ticket.1.name }}</h6>
+                        <p>Жанр : {{ genre }}</p>
+                        <p>Автор : {{ author }}</p>
+                        <p>ISBN : {{ ticket.1.isbn }}</p>
+                        <p class="text-break">Аннотация : {{ ticket.1.annotation }}</p>
+                        <p>Изображение:</p>
+                        <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="/{{ ticket.1.image }}">
+                    {% elif ticket.1.mode == 'author_add' or ticket.1.mode == 'author_edit' %}
+                        <h6>Имя автора : {{ ticket.1.surname }} {{ ticket.1.name }} {{ ticket.1.family_name }}</h6>
+                    {% endif %}
+
                 </div>
             </div>
             <div class="col-6 col-md-4">
+                {% if parent_model %}
                 <h4>Изменяемая модель</h4>
                 <div class="pt-3">
                     <p>Название книги : {{ parent_model.name }}</p>
@@ -33,6 +39,12 @@
                     <p>Изображение:</p>
                     <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="/media/{{ parent_model.image }}">
                 </div>
+                {% elif old_author %}
+                <h4>Изменяемая модель</h4>
+                <div class="pt-3">
+                    <h6>Имя автора : {{ old_author }}</h6>
+                </div>
+                {% endif %}
             </div>
         </div>
 {% endblock %}

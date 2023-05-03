@@ -1,9 +1,16 @@
 from django import forms
+from django.db.models import Q
+
 from .models import *
 from django.core.exceptions import ValidationError
 
 
 class BookCreate(forms.ModelForm):
+    def __init__(self, user, *args, **kwargs):
+        super(BookCreate, self).__init__(*args, **kwargs)
+        self.fields['author'].queryset = Author.objects.filter(
+            Q(is_archive=False, is_accepted=True) | Q(creator=user, is_archive=False, is_accepted=False) | Q(creator=1))
+
     class Meta:
         model = Book
         fields = ['name', 'genre', 'author', 'isbn', 'annotation', 'image', ]

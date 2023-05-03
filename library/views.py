@@ -81,7 +81,7 @@ class FilterBooksView(GenreAuthor, ListView):
 @login_required
 def book_create(request):
     if request.method == 'POST':
-        form = BookCreate(request.POST, request.FILES)
+        form = BookCreate(request.POST, request.FILES, user=request.user.id)
         if form.is_valid():
             form.instance.creator = request.user
             form.save()
@@ -89,7 +89,7 @@ def book_create(request):
             return redirect('book-detail', pk=form.instance.pk)
 
     else:
-        form = BookCreate()
+        form = BookCreate(user=request.user.id)
     return render(request, 'book/book_create.html', {'form': form})
 
 
@@ -186,17 +186,76 @@ class BookListView(GenreAuthor, ListView):
     paginate_by = 9
 
 
+@login_required
 def author_create(request):
     if request.method == 'POST':
         form = AuthorCreate(request.POST)
         if form.is_valid():
             form.instance.creator = request.user
+            if request.user.groups.get().id == 1:
+                form.instance.is_accepted = True
+                form.save()
+                messages.success(request, f'Автор с именем "{form.instance.name}" был создан.')
+                return redirect('author-detail', pk=form.instance.pk)
+            else:
+                form_copy = form
+                form_copy.cleaned_data['mode'] = 'author_add'
+                form_copy.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+                form_copy.cleaned_data['creator'] = request.user.id
+                try:
+                    future_pk = Author.objects.last().pk + 1
+                except:
+                    future_pk = 1
+                form_copy.cleaned_data['pk'] = future_pk
+                ticket_push = Ticket(
+                    playload=json.dumps(form_copy.cleaned_data, ensure_ascii=False)
+                )
+                ticket_push.creator = request.user
+                ticket_push.save()
+                form.instance.is_accepted = False
+                messages.success(request, f'''Заявка на добавление автора с именем "{form.instance}" была создана.
+                                            Вы можете использовать автора для создания заявок на добавление/изменение книг
+                                            до подтверждения администратором.''')
+
             form.save()
-            messages.success(request, f'Автор с именем "{form.instance.name}" был создан.')
-            return redirect('author-detail', pk=form.instance.pk)
+            return redirect('library-home')
 
     else:
         form = AuthorCreate()
+    return render(request, 'author/author_create.html', {'form': form})
+
+
+@login_required
+def author_edit(request, id):
+    author = Author.objects.get(pk=id)
+    form = AuthorCreate(request.POST or None, instance=author)
+
+    if request.method == 'POST':
+        form = AuthorCreate(request.POST, instance=author)
+        if form.is_valid():
+            form.instance.creator = request.user
+            if request.user.groups.get().id == 1:
+                form.instance.creator = request.user
+                form.save()
+                messages.success(request, f'Автор с именем "{form.instance}" был изменен.')
+                return redirect('author-detail', pk=form.instance.pk)
+            else:
+                form_copy = form
+                form_copy.cleaned_data['mode'] = 'author_edit'
+                form_copy.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+                form_copy.cleaned_data['creator'] = request.user.id
+                form_copy.cleaned_data['pk'] = id
+                ticket_push = Ticket(
+                    playload=json.dumps(form_copy.cleaned_data, ensure_ascii=False)
+                )
+                ticket_push.creator = request.user
+                ticket_push.save()
+                form.instance.is_accepted = False
+                messages.success(request, f'''Заявка на изменение автора с именем "{form.instance}" была создана.''')
+                return redirect('author-detail', pk=form.instance.pk)
+
+    else:
+        form = AuthorCreate(instance=author)
     return render(request, 'author/author_create.html', {'form': form})
 
 
@@ -301,17 +360,18 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['author'] = Author.objects.get(pk=kwargs['object'][1]['author'])
-        context['genre'] = Genre.objects.get(pk=kwargs['object'][1]['genre'])
         if kwargs['object'][1]['mode'] == 'book_edit':
+            context['author'] = Author.objects.get(pk=kwargs['object'][1]['author'])
+            context['genre'] = Genre.objects.get(pk=kwargs['object'][1]['genre'])
             context['parent_model'] = Book.objects.get(pk=kwargs['object'][1]['id'])
-            print(context['parent_model'].image)
+        elif kwargs['object'][1]['mode'] == 'author_edit':
+            context['old_author'] = Author.objects.get(pk=kwargs['object'][1]['pk'])
+
         return context
 
     def post(self, request, *args, **kwargs):
         statusAccept = self.request.POST.get("action") == "accept"
         statusReject = self.request.POST.get("action") == "reject"
-        print(json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'])
         if statusAccept:
             if json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'] == 'book_add':
                 def isbn_valid(isbn):
@@ -385,8 +445,6 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
                         img_to_model = f'media/book_pics/{ticket["id"]}/image.jpg', f'media/book_pics/{ticket["id"]}/{future_name}.jpg'
                     else:
                         img_to_model = f'book_pics/{ticket["id"]}/image.jpg'
-                    print(src_dir)
-                    print(dest_dir)
                     shutil.copytree(src_dir, dest_dir, dirs_exist_ok=True)
                 isbn_checked = isbn_valid(ticket['isbn'])
                 book = Book.objects.get(pk=ticket["id"])
@@ -409,13 +467,38 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
                 messages.success(request, f'Заявка на изменение "{book.name}" была одобрена.')
                 return redirect('book-detail', pk=book.pk)
 
+            elif json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'] == 'author_add':
+                ticket = Ticket.objects.get(pk=self.kwargs['pk'])
+                obj = json.loads(ticket.playload)
+                author_temp = Author.objects.get(pk=obj['pk'])
+                author_temp.is_accepted = True
+                ticket.is_archive = True
+                ticket.save()
+                author_temp.save()
+                messages.warning(request, f'Заявка на добавление {author_temp} была одобрена.')
+                return redirect('tickets')
+
+            elif json.loads(Ticket.objects.get(pk=self.kwargs['pk']).playload)['mode'] == 'author_edit':
+                ticket = Ticket.objects.get(pk=self.kwargs['pk'])
+                obj = json.loads(ticket.playload)
+                author_temp = Author.objects.get(pk=obj['pk'])
+                author_temp.surname = obj['surname']
+                author_temp.name = obj['name']
+                author_temp.family_name = obj['family_name']
+                author_temp.is_archive = False
+                author_temp.is_accepted = True
+                ticket.is_archive = True
+                ticket.save()
+                author_temp.save()
+                messages.warning(request, f'Заявка на редактирование {author_temp} была одобрена.')
+                return redirect('tickets')
+
         else:
             pk = self.kwargs.get('pk')
             ticket = Ticket.objects.get(pk=pk)
-            book_name = json.loads(ticket.playload)['name']
             ticket.is_archive = True
             ticket.save()
-            messages.warning(request, f'Заявка на создание "{book_name}" была отклонена.')
+            messages.warning(request, f'Заявка для TICKET № {ticket.pk} была отклонена.')
             return redirect('tickets')
 
 
@@ -431,7 +514,7 @@ def ticket_book_create(request):
         return str(id_number)
 
     if request.method == 'POST':
-        form = BookCreate(request.POST, request.FILES)
+        form = BookCreate(request.user.id, request.POST, request.FILES)
         if form.is_valid():
             form.instance.creator = request.user
             form.cleaned_data['genre'] = form.cleaned_data['genre'].pk
@@ -455,7 +538,7 @@ def ticket_book_create(request):
             messages.success(request, f'Заявка для "{form.instance.name}" была создана.')
             return redirect('library-home')
     else:
-        form = BookCreate()
+        form = BookCreate(user=request.user.id)
     return render(request, 'book/book_create.html', {'form': form})
 
 
@@ -471,7 +554,7 @@ def ticket_book_edit(request, id):
         return str(id_number)
 
     book = Book.objects.get(pk=id)
-    form = BookCreate(request.POST or None, request.FILES or None, instance=book)
+    form = BookCreate(request.user.id, request.POST or None, request.FILES or None, instance=book)
 
     if form.is_valid():
         form.instance.creator = request.user
@@ -491,7 +574,6 @@ def ticket_book_edit(request, id):
         else:
             if os.path.isdir(f'media/book_pics/{id}'):
                 form.cleaned_data['image'] = f'media/{str(Book.objects.get(pk=id).image)}'
-                print(f'media/{str(Book.objects.get(pk=id).image)}')
             else:
                 form.cleaned_data['image'] = f"media/book_pics/default.jpg"
         ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
