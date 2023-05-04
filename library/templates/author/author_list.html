@@ -4,6 +4,9 @@
     <article class="media content-section">
         <div class="media-body">
             <legend class="border-bottom mb-4">Авторы</legend>
+            {% if user.is_authenticated %}
+                <button type="submit" class="save btn btn-secondary"><a class="nav-item nav-link" href="{% url 'author-create' %}">Добавить автора</a></button>
+            {% endif %}
             {% for author in authors %}
                 <a href="{% url 'author-detail' author.id %}" class="nav-item nav-link"><p>{{ author }}</p></a>
             {% endfor %}

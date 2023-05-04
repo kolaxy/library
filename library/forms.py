@@ -24,6 +24,12 @@ class BookCreate(forms.ModelForm):
         }
 
 
+class GenreCreate(forms.ModelForm):
+    class Meta:
+        model = Genre
+        fields = ['name', ]
+
+
 class AuthorCreate(forms.ModelForm):
     class Meta:
         model = Author

@@ -11,6 +11,8 @@ from io import BytesIO
 
 class Genre(models.Model):
     name = models.CharField('Жанр', max_length=30)
+    is_archive = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

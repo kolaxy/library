@@ -18,7 +18,9 @@
             {% endif %}
         </div>
         <div class="col">
-            <a href="{% url 'book-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Редактировать</a>
+            {% if user.groups.get.id == 1 %}
+                <a href="{% url 'book-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Редактировать ( Админ вариант )</a>
+            {% endif %}
             <a href="{% url 'ticket-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Оставить заявку на редактирование</a>
             <p>Автор : {{ object.author }}</p>
             <p>Жанр: {{ object.genre }}</p>
@@ -64,7 +66,10 @@
                         <p class="text-break">{{ comment.body }}</p>
                     </div>
             </div>
-            <a href="{% url 'comment-delete' comment.id %}">Удалить</a>
+            {% if user.id == comment.creator.id or user.groups.get.id == 1 %}
+                <a href="{% url 'comment-delete' comment.id %}">Удалить</a>
+                <a href="{% url 'comment-edit' comment.id %}">Редактировать</a>
+            {% endif %}
         </article>
         {% endfor %}
     </div>

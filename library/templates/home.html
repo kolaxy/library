@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Главная{% endblock %}
 {% block content %}
-    <h2>Content for My App</h2>
-    <p>Stuff etc etc.</p>
+    <legend class="border-bottom mb-4">Главная страница. Данные за всё время.</legend>
+    <p>Книги : {{ books }}</p>
+    <p>Жанры : {{ genres }}</p>
+    <p>Авторы : {{ authors }}</p>
+    <p>Пользователи : {{ profiles }}</p>
+    <p>Комментарии : {{ comments }}</p>
+    <p>Заявки : {{ tickets }}</p>
 {% endblock content %}

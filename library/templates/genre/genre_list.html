@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}
+Жанры
+{% endblock %}
+{% block content %}
+    <legend class="border-bottom mb-4">Жанры
+    {% if user.is_authenticated %}
+        <button type="submit" class="save btn btn-secondary" style="float: right;"><a class="nav-item nav-link" href="{% url 'genre-create' %}">Добавить жанр</a></button>
+    {% endif %}
+    </legend>
+{% for genre in genres %}
+    <p><a class="nav-item nav-link" href="{% url 'genre-detail' genre.pk %}">{{ genre }}</a></p>
+{% endfor %}
+{% include 'base/pagination.html' %}
+{% endblock %}

@@ -15,6 +15,11 @@ urlpatterns = [
     path('', views.home, name='library-home'),
     path('about/', views.about, name='library-about'),
 
+    path('genres/', views.GenreListView.as_view(), name='genres'),
+    path('genres/new', views.genre_create, name='genre-create'),
+    path('genres/<int:pk>/', views.GenreDetailView.as_view(), name='genre-detail'),
+    path('genres/<int:id>/edit', views.genre_edit, name='genre-edit'),
+
     path('books/', BookListView.as_view(), name='books'),
     path('books/<int:pk>/', BookDetailView.as_view(), name='book-detail'),
     path('books/new/', views.book_create, name='book-create'),

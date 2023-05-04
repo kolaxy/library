@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Жанр{% endblock %}
+{% block content %}
+<legend class="border-bottom mb-4">Данные жанра</legend>
+<form class="row g-3" method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+<div class="col-12">
+    <button type="submit" class="save btn btn-secondary">Сохранить</button>
+</div>
+</form>
+{% endblock %}
