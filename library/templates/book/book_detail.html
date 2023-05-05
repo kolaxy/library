@@ -15,13 +15,13 @@
                 {% else %}
                     <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Удалить из избранного</a>
                 {% endif %}
-            {% endif %}
-        </div>
-        <div class="col">
+            <a href="{% url 'ticket-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Оставить заявку на редактирование</a>
             {% if user.groups.get.id == 1 %}
                 <a href="{% url 'book-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Редактировать ( Админ вариант )</a>
             {% endif %}
-            <a href="{% url 'ticket-edit' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Оставить заявку на редактирование</a>
+            {% endif %}
+        </div>
+        <div class="col">
             <p>Автор : {{ object.author }}</p>
             <p>Жанр: {{ object.genre }}</p>
             <p>ISBN : {{ object.isbn }}</p>
@@ -54,7 +54,7 @@
         <article class="media content-section">
             <div class="box">
                 <p class="entry-title post-title">
-                    <a href="#" class="nav-item nav-link">
+                    <a href="{% url 'profile-detail' comment.creator.id %}" class="nav-item nav-link">
                         <img class="rounded-circle mb-2 ico-ind" width="30" height="30" src="{{ comment.creator.profile.image.url }}" alt="">
                         {{ comment.creator }} -- {{ comment.creation_time }}
                     </a>

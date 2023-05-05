@@ -8,8 +8,21 @@
         <button type="submit" class="save btn btn-secondary" style="float: right;"><a class="nav-item nav-link" href="{% url 'genre-create' %}">Добавить жанр</a></button>
     {% endif %}
     </legend>
-{% for genre in genres %}
-    <p><a class="nav-item nav-link" href="{% url 'genre-detail' genre.pk %}">{{ genre }}</a></p>
-{% endfor %}
+
+<div class="row">
+    {% for genre in genres %}
+        <div class="col-md-4">
+            <a class="nav-item nav-link" href="{% url 'genre-detail' genre.pk %}">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-body">
+                        <p>{{ genre }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+
 {% include 'base/pagination.html' %}
 {% endblock %}

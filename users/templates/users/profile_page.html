@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ object.name }}{% endblock %}
+{% block content %}
+<legend class="border-bottom mb-4">Профиль участника</legend>
+<div class="card" style="width: 18rem;">
+    <img src="{{ object.user.profile.image.url }}" class="card-img-top" alt="...">
+    <div class="card-body">
+        <p class="card-text">{{ object.user }}</p>
+        <p class="card-text">{{ object.user.groups.get.name }}</p>
+    </div>
+</div>
+{% endblock %}

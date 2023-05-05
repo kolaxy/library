@@ -130,3 +130,4 @@ LOGIN_REDIRECT_URL = 'library-home'
 LOGIN_URL = 'login'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+FIXTURE_DIRS = os.path.join(BASE_DIR, 'users/fixtures')

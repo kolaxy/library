@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.views.generic import DetailView
+
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
@@ -9,6 +11,7 @@ from django.http import HttpResponseRedirect
 from library.models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .decorators import unauthenticated_user
+from .models import Profile
 
 
 @unauthenticated_user
@@ -69,3 +72,9 @@ def favourite_list(request):
     return render(request,
                   'users/favourites.html',
                   {'books': books, "page_obj": page_obj})
+
+
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = 'users/profile_page.html'
+    context_object_name = 'object'

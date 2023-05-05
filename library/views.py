@@ -462,7 +462,7 @@ class TicketListView(PermissionRequiredMixin, ListView):
     permission_required = 'ticket.can_view_ticket'
 
     def get_queryset(self):
-        return [(ticket.pk, json.loads(ticket.playload)) for ticket in
+        return [(ticket.pk, json.loads(ticket.playload), Profile.objects.get(pk=json.loads(ticket.playload)['creator']).user) for ticket in
                 Ticket.objects.filter(is_archive=False).order_by('-pk')]
 
 
@@ -480,10 +480,11 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if kwargs['object'][1]['mode'] == 'book_edit':
+        if kwargs['object'][1]['mode'] in ('book_add', 'book_edit'):
             context['author'] = Author.objects.get(pk=kwargs['object'][1]['author'])
             context['genre'] = Genre.objects.get(pk=kwargs['object'][1]['genre'])
-            context['parent_model'] = Book.objects.get(pk=kwargs['object'][1]['id'])
+            if kwargs['object'][1]['mode'] == 'book_edit':
+                context['parent_model'] = Book.objects.get(pk=kwargs['object'][1]['id'])
         elif kwargs['object'][1]['mode'] == 'author_edit':
             context['old_author'] = Author.objects.get(pk=kwargs['object'][1]['pk'])
 

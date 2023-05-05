@@ -2,25 +2,39 @@
 {% block title %}Список заявок{% endblock %}
 {% block content %}
     <legend class="border-bottom mb-4">Список заявок</legend>
+    {{ author_name }}
     <table class="table">
         <thead>
             <tr>
                 <th scope="col">Номер</th>
-                <th scope="col">Имя модели</th>
-                <th scope="col">Тип</th>
+                <th scope="col">Название</th>
+                <th scope="col">Тип заявки</th>
                 <th scope="col">Дата создания</th>
-                <th scope="col">Пользователь, ID</th>
+                <th scope="col">Создатель заявки</th>
             </tr>
         </thead>
         <tbody>
                 {% for ticket in tickets %}
-
                         <tr>
                             <th scope="row">{{ ticket.0 }}</th>
                             <td><a href="{% url 'ticket-details' ticket.0 %}">{{ ticket.1.surname }} {{ ticket.1.name }} {{ ticket.1.family_name }}</a></td>
-                            <td>{{ ticket.1.mode }}</td>
+                            <td>
+                                {% if ticket.1.mode == 'book_add' %}
+                                Добавить книгу
+                                {% elif ticket.1.mode == 'book_edit' %}
+                                Редактировать книгу
+                                {% elif ticket.1.mode == 'genre_add' %}
+                                Добавить жанр
+                                {% elif ticket.1.mode == 'genre_edit' %}
+                                Редактировать жанр
+                                {% elif ticket.1.mode == 'author_add' %}
+                                Добавить автора
+                                {% elif ticket.1.mode == 'author_edit' %}
+                                Редактировать автора
+                                {% endif %}
+                            </td>
                             <td>{{ ticket.1.creation_time }}</td>
-                            <td>{{ ticket.1.creator }}</td>
+                            <td><a href="{% url 'profile-detail' ticket.1.creator %}">{{ ticket.2 }}</a></td>
                         </tr>
                 {% endfor %}
         </tbody>
