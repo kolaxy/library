@@ -638,6 +638,7 @@ def ticket_book_create(request):
             form.cleaned_data['mode'] = 'book_add'
             form.cleaned_data['creator'] = request.user.id
             form.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            form.cleaned_data['image'] = f"media/book_pics/default.jpg"
             ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
             ticket_push.creator = request.user
             ticket_push.save()
@@ -671,6 +672,7 @@ def ticket_book_edit(request, id):
         form.cleaned_data['mode'] = 'book_edit'
         form.cleaned_data['creator'] = request.user.id
         form.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        form.cleaned_data['image'] = f"media/book_pics/default.jpg"
         ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
         ticket_push.creator = request.user
         ticket_push.save()
