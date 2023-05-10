@@ -10,20 +10,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
 
-#  web:
-#    build: .
-#    command: bash -c "python manage.py migrate --noinput &&
-#      python manage.py loaddata groups.json &&
-#      python manage.py runserver 0.0.0.0:8000"
-#    volumes:
-#      - .:/usr/src/app
-#    ports:
-#      - 8000:8000
-#    depends_on:
-#      - db
-#    container_name: e-lib
-#
-#volumes:
-#  postgres_data:
 
-#python manage.py loaddata groups.json &&
+volumes:
+  postgres_data:

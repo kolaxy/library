@@ -8,7 +8,7 @@
 <legend class="border-bottom mb-4">{{ object.name }}</legend>
     <div class="row">
         <div class="col">
-            <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="{{ book.image.url }}">
+<!--            <img width="200" height="300" class="float-md-start mb-3 ms-md-3" src="{{ book.image.url }}">-->
             {% if user.is_authenticated %}
                 {% if not fav %}
                     <a href="{% url 'favourite-add' book.id %}" class="btn btn-outline-secondary mb-3 ms-md-3">Добавить в избранное</a>
@@ -55,7 +55,7 @@
             <div class="box">
                 <p class="entry-title post-title">
                     <a href="{% url 'profile-detail' comment.creator.id %}" class="nav-item nav-link">
-                        <img class="rounded-circle mb-2 ico-ind" width="30" height="30" src="{{ comment.creator.profile.image.url }}" alt="">
+<!--                        <img class="rounded-circle mb-2 ico-ind" width="30" height="30" src="{{ comment.creator.profile.image.url }}" alt="">-->
                         {{ comment.creator }} -- {{ comment.creation_time }}
                     </a>
                 </p>

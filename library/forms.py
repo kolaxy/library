@@ -13,7 +13,7 @@ class BookCreate(forms.ModelForm):
 
     class Meta:
         model = Book
-        fields = ['name', 'genre', 'author', 'isbn', 'annotation', 'image', ]
+        fields = ['name', 'genre', 'author', 'isbn', 'annotation', ]
 
         widgets = {
             "name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название'}),

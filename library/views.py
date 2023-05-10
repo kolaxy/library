@@ -192,7 +192,7 @@ def genre_edit(request, id):
 @login_required
 def book_create(request):
     if request.method == 'POST':
-        form = BookCreate(request.POST, request.FILES, user=request.user.id)
+        form = BookCreate(request.user.id, request.POST, request.FILES)
         if form.is_valid():
             form.instance.creator = request.user
             form.save()
@@ -506,15 +506,6 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
                 pk = self.kwargs.get('pk')
                 ticket = Ticket.objects.get(pk=pk)
                 ticket = json.loads(ticket.playload)
-                img = ticket['image'].split('/')[1:]
-                img_to_model = 'book_pics/default.jpg'
-                if img[-1] == 'image.jpg':
-                    new_img_dir = os.path.join(settings.MEDIA_ROOT, f'book_pics/{Book.get_image_id()}/')
-                    src_dir = os.path.join(settings.MEDIA_ROOT, f'tickets/books/{pk}')
-                    dest_dir = new_img_dir
-                    files = os.listdir(src_dir)
-                    shutil.copytree(src_dir, dest_dir)
-                    img_to_model = f'book_pics/{Book.get_image_id()}/image.jpg'
                 isbn_checked = isbn_valid(ticket['isbn'])
                 book = Book(
                     name=ticket['name'],
@@ -522,7 +513,6 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
                     author=Author.objects.get(pk=ticket['author']),
                     isbn=isbn_checked[0],
                     annotation=ticket['annotation'],
-                    image=img_to_model,
                     creator=User.objects.get(pk=ticket['creator']),
                 )
                 book.save()
@@ -549,24 +539,6 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
                 pk = self.kwargs.get('pk')
                 ticket = Ticket.objects.get(pk=pk)
                 ticket = json.loads(ticket.playload)
-                img = ticket['image'].split('/')[1:]
-                img_to_model = 'book_pics/default.jpg'
-                if img[-1] == 'image.jpg':
-                    try:
-                        new_img_dir = os.path.join(settings.MEDIA_ROOT, f'book_pics/{ticket["id"]}/')
-                    except:
-                        pass
-                    src_dir = os.path.join(settings.MEDIA_ROOT, f'tickets/books/{pk}')
-                    dest_dir = new_img_dir
-                    files = os.listdir(src_dir)
-                    if os.path.isfile(f'media/book_pics/{ticket["id"]}/image.jpg'):
-                        future_name = int(time())
-                        os.rename(f'media/book_pics/{ticket["id"]}/image.jpg',
-                                  f'media/book_pics/{ticket["id"]}/{future_name}.jpg')
-                        img_to_model = f'media/book_pics/{ticket["id"]}/image.jpg', f'media/book_pics/{ticket["id"]}/{future_name}.jpg'
-                    else:
-                        img_to_model = f'book_pics/{ticket["id"]}/image.jpg'
-                    shutil.copytree(src_dir, dest_dir, dirs_exist_ok=True)
                 isbn_checked = isbn_valid(ticket['isbn'])
                 book = Book.objects.get(pk=ticket["id"])
                 book.name = ticket['name']
@@ -574,7 +546,6 @@ class TicketDetailView(PermissionRequiredMixin, DetailView):
                 book.author = Author.objects.get(pk=ticket['author'])
                 book.isbn = isbn_checked[0]
                 book.annotation = ticket['annotation']
-                book.image = img_to_model
                 book.creator = User.objects.get(pk=ticket['creator'])
                 book.save()
                 update = Ticket.objects.get(pk=pk)
@@ -667,15 +638,6 @@ def ticket_book_create(request):
             form.cleaned_data['mode'] = 'book_add'
             form.cleaned_data['creator'] = request.user.id
             form.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-            if request.FILES:
-                data = request.FILES['image']
-                form.cleaned_data.pop('image')
-                path = default_storage.save(f'tickets/books/{get_id()}/image.jpg',
-                                            ContentFile(data.read()))
-                tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-                form.cleaned_data['image'] = f"media/tickets/books/{get_id()}/image.jpg"
-            else:
-                form.cleaned_data['image'] = f"media/book_pics/default.jpg"
             ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
             ticket_push.creator = request.user
             ticket_push.save()
@@ -709,18 +671,6 @@ def ticket_book_edit(request, id):
         form.cleaned_data['mode'] = 'book_edit'
         form.cleaned_data['creator'] = request.user.id
         form.cleaned_data['creation_time'] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-        if request.FILES:
-            data = request.FILES['image']
-            form.cleaned_data.pop('image')
-            path = default_storage.save(f'tickets/books/{get_id()}/image.jpg',
-                                        ContentFile(data.read()))
-            tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-            form.cleaned_data['image'] = f"media/tickets/books/{get_id()}/image.jpg"
-        else:
-            if os.path.isdir(f'media/book_pics/{id}'):
-                form.cleaned_data['image'] = f'media/{str(Book.objects.get(pk=id).image)}'
-            else:
-                form.cleaned_data['image'] = f"media/book_pics/default.jpg"
         ticket_push = Ticket(playload=json.dumps(form.cleaned_data, ensure_ascii=False))
         ticket_push.creator = request.user
         ticket_push.save()

@@ -61,7 +61,7 @@ class Book(models.Model):
 
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     favourites = models.ManyToManyField(User, related_name='favourite', default=None, blank=True)
-    image = models.ImageField(default='book_pics/default.jpg', upload_to=upload_to, null=True, blank=True)
+    # image = models.ImageField(default='book_pics/default.jpg', upload_to=upload_to, null=True, blank=True)
     deletion_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
@@ -70,22 +70,22 @@ class Book(models.Model):
     def get_absolute_url(self):
         return reverse('book-detail', kwargs={'pk': self.pk})
 
-    def save(
-            self, *args, **kwargs
-    ):
-        super().save()
-
-        def convert_to_jpeg(im):
-            with BytesIO() as f:
-                im.save(f, format='JPEG')
-                return f.getvalue()
-
-        img = Image.open(self.image.path)
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img = img.convert('RGB')
-            img.save(self.image.path)
+    # def save(
+    #         self, *args, **kwargs
+    # ):
+    #     super().save()
+    #
+    #     def convert_to_jpeg(im):
+    #         with BytesIO() as f:
+    #             im.save(f, format='JPEG')
+    #             return f.getvalue()
+    #
+    #     img = Image.open(self.image.path)
+    #     if img.height > 300 or img.width > 300:
+    #         output_size = (300, 300)
+    #         img.thumbnail(output_size)
+    #         img = img.convert('RGB')
+    #         img.save(self.image.path)
 
 
 class Comment(models.Model):
