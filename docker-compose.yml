@@ -1,7 +1,25 @@
 version: '3.9'
 
 services:
-  db:
+  elib:
+    image: kolaxy/elib:1.0
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    profiles:
+      - backend
+    environment:
+      DATABASE_NAME: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_EMAIL: admin@admin.com
+
+  postgres:
     image: postgres:14
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -9,6 +27,11 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
+    profiles:
+      - backend
+      - dev
+    ports:
+      - 5432:5432
 
 
 volumes:

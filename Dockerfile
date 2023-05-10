@@ -11,5 +11,6 @@ COPY ./requirements.txt .
 COPY . /app
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["python", "manage.py", "runserver"]
+RUN chmod +x entrypoint.sh
 
+ENTRYPOINT ["/app/entrypoint.sh"]
