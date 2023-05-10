@@ -8,7 +8,10 @@ from .models import Profile
 def create_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-        instance.groups.add(Group.objects.get(name='Readers'))
+        if instance.is_superuser:
+            instance.groups.add(Group.objects.get(name='Librarians'))
+        else:
+            instance.groups.add(Group.objects.get(name='Readers'))
 
 
 @receiver(post_save, sender=User)

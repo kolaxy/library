@@ -87,6 +87,19 @@ DATABASES = {
     }
 }
 
+# FOR DOCKER BELOW !
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'password',
+#         'HOST': 'db',
+#         'PORT': '5432',
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -130,4 +143,4 @@ LOGIN_REDIRECT_URL = 'library-home'
 LOGIN_URL = 'login'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-FIXTURE_DIRS = os.path.join(BASE_DIR, 'users/fixtures')
+# FIXTURE_DIRS = os.path.join(BASE_DIR, 'users/fixtures')
