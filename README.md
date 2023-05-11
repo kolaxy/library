@@ -40,7 +40,7 @@ git clone git@github.com:kolaxy/library.git
 ### Cd into project folder 
 
 ```commandline
-cd library/library_project
+cd library
 ```
 
 ### Build application Docker image 
