@@ -31,10 +31,16 @@ Ticket system allows users with only reader access to create tickets for books o
 
 Start web application and database in Docker
 
+### Clone project from git via ssh
+
+```commandline
+git clone git@github.com:kolaxy/library.git
+```
+
 ### Cd into project folder 
 
 ```commandline
-cd library_project
+cd library/library_project
 ```
 
 ### Build application Docker image 
